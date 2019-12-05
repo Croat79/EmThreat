@@ -110,10 +110,11 @@ if __name__ == "__main__":
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
+    '''
     for p in results:
         if len(p) > 5 and "/" in p:
             print(p)
-
+    '''
     # Graphing madness below!
     N = np.arange(10)
     # These list comprehensions are crazy!
