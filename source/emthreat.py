@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # Otherwise we can write a subset of URLs to a smaller file.
     # write_urls("test1", words)
     args = sys.argv
-    total_urls = args[1]
+    total_urls = int(args[1])
     db_file = str(args[2])
     words = demo_fetch(total_urls, db_file)
     start = timer()
