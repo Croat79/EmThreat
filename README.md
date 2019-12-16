@@ -1,5 +1,5 @@
 # EmThreat
-Short for emerging threat. Phishing intelligence.
+Phishing Intelligence tool used to detect emerging threats by analyzing reports from PhishTank.
 
 Dependency list:
 - numpy
