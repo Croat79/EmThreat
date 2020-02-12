@@ -94,7 +94,7 @@ def write_urls(file_name, urls):
 
 def demo_fetch(entries, db):
     # Pulls URLs from a text file as opposed to json.
-    # Good for demos where we do not have the space to store an entire DB.
+    # Good for demos where we do not have the space or time to store an entire DB.
     urls = []
     with open(db) as file:
         for count, value in enumerate(file):
@@ -105,7 +105,22 @@ def demo_fetch(entries, db):
     print(len(urls))
     return urls
 
+def build_graph(results, names):
+    spacing = 3
+    # Adding the URLs to the bar chart.
+    for i, x in enumerate(results):
+        plt.barh(spacing * i, height=2, width=x)
+    for j, v in enumerate(names):
+        plt.text(2, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
+    # Making sure yticks are empty
+    plt.yticks([], [])
+    # Adding out labels
+    plt.ylabel('URLs')
+    plt.xlabel('Count')
+    plt.title('Phishing Threats')
+    plt.show()
 
+    
 if __name__ == "__main__":
     # Use the local_url_fetch if you are storing the db.
     # words = local_url_fetch(400, 'verified_online.json')
@@ -126,26 +141,15 @@ if __name__ == "__main__":
             print(p)
     '''
     # Graphing madness below!
-    N = np.arange(10)
     # These list comprehensions are crazy!
+    
+    ## TODO FIX THIS.
+    ## Store it in another function that CLEANLY and CLEARLY gets the top X most common results
     graph_results = sorted([results[x] for x in results if len(x) > 5 and "/" in x])[-10:]
     graph_ticks = sorted([x for x in results if len(x) > 5 and "/" in x])[-10:]
     # If a URL is too long...
     for i, v in enumerate(graph_ticks):
         if len(v) > 30:
             graph_ticks[i] = v[:30] + "..."
-
-    spacing = 3
-    # Adding the URLs to the bar chart.
-    for i, x in enumerate(graph_results):
-        plt.barh(spacing * i, height=2, width=x)
-    for j, v in enumerate(graph_ticks):
-        plt.text(2, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
-    # This was a cool solution but the URLs were still too long.
-    plt.yticks([], [])
-    #plt.set_yticks()
-    #plt.legend(graph_ticks)
-    plt.ylabel('URLs')
-    plt.xlabel('Count')
-    plt.title('Phishing URLs')
-    plt.show()
+    build_graph(graph_results, graph_ticks)
+    
