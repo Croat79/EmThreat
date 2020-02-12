@@ -6,6 +6,11 @@ from lcs import driver
 from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import sys
+
+## TODO Break online_url_fetch into different functions
+## TODO Implement additional utilities to graph IPs
+## TODO Add option to look at domain OR software path
+
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
 for software that they use by analyzing the URLs on PhishTank
@@ -19,17 +24,20 @@ Usage:
 
 python3 EmThreat.py [number of URLs to parse] [db_file]
 '''
+# Headers to append to any request.
+ID = "YOUR PHISHTANK ID"
+headers = {"user-agent": "phishtank/" + str(ID)}
+
 
 def online_url_fetch(pages):
     # Fetches recently reported phishing sites.
-    # Do not use too much to prevent heavy site traffic.
     page = 1
     # check_url = "https://checkurl.phishtank.com/checkurl/"
     online_words = []
     phish_id = 0
     while page < pages:
         search_url = f"https://www.phishtank.com/phish_search.php?page={page}&active=y&verified=u"
-        r = requests.get(search_url)
+        r = requests.get(search_url, headers=headers)
         if r.status_code == 200:
             soup = BeautifulSoup(r.text, 'html.parser')
             try:
@@ -47,7 +55,7 @@ def online_url_fetch(pages):
                             # If it is hidden, we have to go to the page directly
                             if "..." in row.text:
                                 phish_url = f"https://www.phishtank.com/phish_detail.php?phish_id={phish_id}"
-                                search_phish = requests.get(phish_url)
+                                search_phish = requests.get(phish_url, headers=headers)
                                 if search_phish.status_code == 200:
                                     search_soup = BeautifulSoup(search_phish.text, 'html.parser')
                                     style = "word-wrap:break-word;"
@@ -90,9 +98,11 @@ def demo_fetch(entries, db):
     urls = []
     with open(db) as file:
         for count, value in enumerate(file):
+            print(type(entries))
             if count == entries:
                 break
             urls.append(value.strip())
+    print(len(urls))
     return urls
 
 
@@ -125,14 +135,17 @@ if __name__ == "__main__":
         if len(v) > 30:
             graph_ticks[i] = v[:30] + "..."
 
-    spacing = 1
+    spacing = 3
     # Adding the URLs to the bar chart.
     for i, x in enumerate(graph_results):
-        plt.bar(spacing * i, height=x, tick_label="")
+        plt.barh(spacing * i, height=2, width=x)
+    for j, v in enumerate(graph_ticks):
+        plt.text(2, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
     # This was a cool solution but the URLs were still too long.
-    # plt.xticks(N, graph_ticks, rotation=70)
-    plt.legend(graph_ticks)
-    plt.ylabel('Count')
-    plt.xlabel('URLs')
+    plt.yticks([], [])
+    #plt.set_yticks()
+    #plt.legend(graph_ticks)
+    plt.ylabel('URLs')
+    plt.xlabel('Count')
     plt.title('Phishing URLs')
     plt.show()
