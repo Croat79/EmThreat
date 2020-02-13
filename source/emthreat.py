@@ -1,4 +1,4 @@
-import numpy as np
+#!/usr/bin/env python3
 import requests
 from time import sleep
 from bs4 import BeautifulSoup
@@ -9,7 +9,6 @@ import sys
 
 ## TODO Break online_url_fetch into different functions
 ## TODO Implement additional utilities to graph IPs
-## TODO Add option to look at domain OR software path
 
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
@@ -22,7 +21,7 @@ that software may have a new exploit targeting it.
 
 Usage:
 
-python3 EmThreat.py [number of URLs to parse] [db_file]
+python3 EmThreat.py [number of URLs to parse] [db_file] [filter]
 '''
 # Headers to append to any request.
 ID = "YOUR PHISHTANK ID"
@@ -32,6 +31,7 @@ headers = {"user-agent": "phishtank/" + str(ID)}
 def online_url_fetch(pages):
     # Fetches recently reported phishing sites.
     page = 1
+    pause = 2
     # check_url = "https://checkurl.phishtank.com/checkurl/"
     online_words = []
     phish_id = 0
@@ -67,7 +67,8 @@ def online_url_fetch(pages):
             except:
                 print("No table found.")
         else:
-            sleep(2)
+            # Give the server a break
+            sleep(pause)
         page += 1
 
 
@@ -84,6 +85,21 @@ def local_url_fetch(entries, db):
 
     return urls
 
+def csv_fetch(entries, db):
+    # Opens a csv file and fetches information.
+
+    # Split by comma
+    urls = []
+    with open(db) as file:
+        for count, url in enumerate(file):
+            if count == entries:
+                break
+            try:
+                urls.append(url[1].split("//")[1])
+            except:
+                pass
+
+    return urls
 
 def write_urls(file_name, urls):
     # Write select URLs to a file.
@@ -98,29 +114,53 @@ def demo_fetch(entries, db):
     urls = []
     with open(db) as file:
         for count, value in enumerate(file):
-            print(type(entries))
+            #print(type(entries))
             if count == entries:
                 break
             urls.append(value.strip())
-    print(len(urls))
     return urls
 
-def build_graph(results, names):
+def split_url(url, filter):
+    # Helper function to split a URL into the domain or software path.
+    tmp = url.split("/", 1)
+    if filter == "domain":
+        return tmp[0]
+    elif filter == "path":
+        if len(tmp) > 1:
+            return tmp[1]
+        else:
+            # There is no path.
+            return ''
+    else:
+        # Could return a default value like domain.
+        print("Invalid filter. Returning full URL.")
+        return tmp
+
+def filter_input(wordlist, url_filter):
+    # Goes over a wordlist and splits the urls.
+    tmp = []
+    for word in wordlist:
+        tmp.append(split_url(word, url_filter))
+    # Removes None values.
+    return list(filter(None, tmp))
+
+def build_graph(results, names, url_filter):
     spacing = 3
+    start_of_text = len(names) / 100 * 2 #Places test 2% in every time.
     # Adding the URLs to the bar chart.
     for i, x in enumerate(results):
         plt.barh(spacing * i, height=2, width=x)
     for j, v in enumerate(names):
-        plt.text(2, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
+        plt.text(start_of_text, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
     # Making sure yticks are empty
     plt.yticks([], [])
     # Adding out labels
     plt.ylabel('URLs')
     plt.xlabel('Count')
-    plt.title('Phishing Threats')
+    plt.title(f'Phishing Threats by {url_filter.title()}')
     plt.show()
 
-    
+
 if __name__ == "__main__":
     # Use the local_url_fetch if you are storing the db.
     # words = local_url_fetch(400, 'verified_online.json')
@@ -129,9 +169,14 @@ if __name__ == "__main__":
     args = sys.argv
     total_urls = int(args[1])
     db_file = str(args[2])
-    words = demo_fetch(total_urls, db_file)
+    url_filter = str(args[3]) # Path or domain
+    # Call a function to split and grab either the url or path
+    words = csv_fetch(total_urls, db_file)
+    words = filter_input(words, url_filter)
+    print(words)
     start = timer()
     results = driver(words)
+    #print(results)
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
@@ -140,16 +185,15 @@ if __name__ == "__main__":
         if len(p) > 5 and "/" in p:
             print(p)
     '''
-    # Graphing madness below!
-    # These list comprehensions are crazy!
-    
-    ## TODO FIX THIS.
-    ## Store it in another function that CLEANLY and CLEARLY gets the top X most common results
-    graph_results = sorted([results[x] for x in results if len(x) > 5 and "/" in x])[-10:]
-    graph_ticks = sorted([x for x in results if len(x) > 5 and "/" in x])[-10:]
+    total_matches = 10
+    min_output_length = 5
+    # Sort our results and then store the top X key/value pairs.
+    results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
+    graph_results = sorted(results.values())[-total_matches:]
+    graph_ticks = sorted(results.keys())[-total_matches:]
+    print(results)
     # If a URL is too long...
     for i, v in enumerate(graph_ticks):
         if len(v) > 30:
             graph_ticks[i] = v[:30] + "..."
-    build_graph(graph_results, graph_ticks)
-    
+    build_graph(graph_results, graph_ticks, url_filter)
