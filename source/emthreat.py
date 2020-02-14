@@ -95,7 +95,7 @@ def csv_fetch(entries, db):
             if count == entries:
                 break
             try:
-                urls.append(url[1].split("//")[1])
+                urls.append(url.split(",")[1].split("//")[1])
             except:
                 pass
 
@@ -146,7 +146,7 @@ def filter_input(wordlist, url_filter):
 
 def build_graph(results, names, url_filter):
     spacing = 3
-    start_of_text = len(names) / 100 * 2 #Places test 2% in every time.
+    start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
     # Adding the URLs to the bar chart.
     for i, x in enumerate(results):
         plt.barh(spacing * i, height=2, width=x)
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     # Call a function to split and grab either the url or path
     words = csv_fetch(total_urls, db_file)
     words = filter_input(words, url_filter)
-    print(words)
+
     start = timer()
     results = driver(words)
     #print(results)
@@ -188,10 +188,11 @@ if __name__ == "__main__":
     total_matches = 10
     min_output_length = 5
     # Sort our results and then store the top X key/value pairs.
+    # Filter results for faster outputs
     results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
     graph_results = sorted(results.values())[-total_matches:]
     graph_ticks = sorted(results.keys())[-total_matches:]
-    print(results)
+    #print(results)
     # If a URL is too long...
     for i, v in enumerate(graph_ticks):
         if len(v) > 30:

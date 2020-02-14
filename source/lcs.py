@@ -3,7 +3,7 @@
 
 '''
 This code is used to handle the longest common substring algorithm and a driver that will go over a wordlist
-and compute a dictionary containing the most common substrings. 
+and compute a dictionary containing the most common substrings.
 '''
 def fast_lcs(first, second):
     m = len(first)
@@ -13,7 +13,7 @@ def fast_lcs(first, second):
     start, end = 0, 0
     length = 0
     skip = False
-    
+
     # Go over the first word
     for i in range(1, m + 1):
         # Go over the second word
@@ -43,6 +43,12 @@ def fast_lcs(first, second):
     # Flip the result since it is backwards.
     return substring[::-1]
 
+def new_lcs(s1, s2):
+    from difflib import SequenceMatcher
+    s = SequenceMatcher(None, s1, s2)
+    lcs = ''.join([s1[block.a:(block.a + block.size)] for block in s.get_matching_blocks()])
+    return lcs
+
 # Maintaining 2 dictionaries in the driver.
 # As well as an n-length list using a n^2 loop.
 ## TODO Find optimizations.
@@ -64,7 +70,7 @@ def driver(wordlist):
 
             # Store the longest common substring.
             # Will either be a string or '0'
-            holder = fast_lcs(i, j)
+            holder = new_lcs(i, j)
 
             # If the substring already exists we increment it
             # otherwise we insert it.
@@ -74,5 +80,3 @@ def driver(wordlist):
                 urls[holder] = 1
 
     return urls
-
-
