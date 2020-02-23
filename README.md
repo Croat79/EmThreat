@@ -7,12 +7,11 @@ The goal of this tool is to quickly analyze either the most common domains or th
 ### Dependency list:
 - numpy
 - requests
-- time
 - bs4
 - matplotlib
 
 ### Usage:
-`python3 emthreat.py [number of urls to scan] [input file] {domain, path}`
+`python3 emthreat.py [number of urls] [input file] {domain, path}`
 
 Specify the number of URLs you want to scan out of a CSV file, the path to the CSV file, and whether you want to output the most common domains or paths.
 
