@@ -4,6 +4,8 @@ Phishing Intelligence tool used to detect emerging threats by analyzing reports 
 
 The goal of this tool is to quickly analyze either the most common domains or their paths, the latter of which can be used to classify recently vulnerable software and provide immediate warning to security teams before wide-scale attacks are reported.
 
+This is built off of the amazing research done by [UAB's Center for Cyber Security](https://www.uab.edu/cas/thecenter/images/Documents/Identifying-Vulnerable-Websites-by-Analysis-of-Common-Strings-in-Phishing-URLs.pdf)
+
 ### Dependency list:
 - numpy
 - requests
