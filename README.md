@@ -25,3 +25,16 @@ emthreat.py is the main file, it handles the processing of information from a lo
 lcs.py handles the longest-common-substring code. It also has a driver to iterate over a combination of every possible input. This needs to have a suffix tree implementation added to considerably speed up  the n\*m computation time.
 
 dataset_utility.py has some minor code that I use for manipulating the database directly in order to see what kind of information might be useful to analysts. Feel free to add functions to it that automate in report tasks or help in parsing the datasets. 
+
+# TODO
+- Build out dataset_utility.py for multiple options
+- Integrate dataset_utility.py into emthreat.py
+- Rig up argument parsing in emthreat.py
+- Clean up online_url_fetch in emthreat.py and include a warning when using it
+- Implement a utility to graph IPs
+- Implement a utility to check neighboring sites on a domain/IP/netblock
+- Build in an auto-report function to send emails to registrars
+- Optimize LCS.py using suffix trees
+- Add chunking into the database (running LCS on small batches in a merge sort approach, where the X most common URLs are brought to the next level)
+- Optimize the LCS.py driver function
+- Build out additional utilities as needed
