@@ -1,5 +1,2 @@
-requests
-time
 bs4
 matplotlib
-sys
