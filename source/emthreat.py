@@ -162,7 +162,7 @@ def build_graph(results, names, url_filter):
 
 
 if __name__ == "__main__":
-    # Use the local_url_fetch if you are storing the db.
+    # Use the local_url_fetch if you are storing the db. (primarily for demo purposes)
     # words = local_url_fetch(400, 'verified_online.json')
     # Otherwise we can write a subset of URLs to a smaller file.
     # write_urls("test1", words)
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     db_file = str(args[2])
     url_filter = str(args[3]) # Path or domain
     # Call a function to split and grab either the url or path
-    words = csv_fetch(total_urls, db_file)
+    words = demo_fetch(total_urls, db_file)
     words = filter_input(words, url_filter)
 
     start = timer()
@@ -180,6 +180,7 @@ if __name__ == "__main__":
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
+    # Below is demo code to only print out results that are long and have slashes, indicating paths.
     '''
     for p in results:
         if len(p) > 5 and "/" in p:
