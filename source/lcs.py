@@ -43,6 +43,8 @@ def fast_lcs(first, second):
     # Flip the result since it is backwards.
     return substring[::-1]
 
+# This is a new experimental function to use SequenceMatcher for faster results.
+# After chunking is implemented we will compare this with the old lcs implementation on blocks of 1000 results.
 def new_lcs(s1, s2):
     from difflib import SequenceMatcher
     s = SequenceMatcher(None, s1, s2)
