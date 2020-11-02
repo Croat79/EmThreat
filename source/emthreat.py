@@ -7,8 +7,8 @@ from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import sys
 
-## TODO Break online_url_fetch into different functions
-## TODO Implement additional utilities to graph IPs
+
+
 
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
@@ -27,7 +27,8 @@ python3 EmThreat.py [number of URLs to parse] [db_file] [filter]
 ID = "YOUR PHISHTANK ID"
 headers = {"user-agent": "phishtank/" + str(ID)}
 
-
+## TODO Break online_url_fetch into different functions
+## TODO Move 'fetches' into their own file.
 def online_url_fetch(pages):
     # Fetches recently reported phishing sites.
     page = 1
@@ -144,6 +145,7 @@ def filter_input(wordlist, url_filter):
     # Removes None values.
     return list(filter(None, tmp))
 
+## TODO Implement additional utilities to graph IPs
 def build_graph(results, names, url_filter):
     spacing = 3
     start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
@@ -186,6 +188,7 @@ if __name__ == "__main__":
         if len(p) > 5 and "/" in p:
             print(p)
     '''
+    ## TODO Replace these values with variables that can be overidden by optional flags.
     total_matches = 10
     min_output_length = 5
     # Sort our results and then store the top X key/value pairs.
