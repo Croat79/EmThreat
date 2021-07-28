@@ -31,14 +31,3 @@ lcs.py handles the longest-common-substring code. It also has a driver to iterat
 dataset_utility.py has some minor code that I use for manipulating the database directly in order to see what kind of information might be useful to analysts. Feel free to add functions to it that automate in report tasks or help in parsing the datasets. 
 
 chunking.py holds functions to break up large datasets to improve the speed of lcs.py. 
-
-# TODO
-Not everything here is for 1.0. Some of these things might have already been done. A lot of housekeeping will be wrapped up before 11/3/20. 
-
-For 2.0:
-- Implement a utility to graph IPs
-- Implement a utility to check neighboring sites on a domain/IP/netblock
-- Build in an auto-report function to send emails to registrars
-- Optimize LCS.py using suffix trees
-- Optimize the LCS.py driver function
-- Build out additional utilities as needed
