@@ -1,14 +1,6 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
 # PROD NOTES
-Build a utility to cure data.
-- Must be built to allow switching between curing for domains and for paths.
-- Will support new-line separated data and CSV files.
-
-The wrong function is currently called in emthreat.py. It should be demo_fetch, not csv_fetch.
-
-- MAGIC could check filetype and automatically choose the right function.
-
 Demo fetch is to be used for local databases. It's called as such because it was used to demo the program. It will be re-named and updated soon.
 
 
@@ -38,17 +30,15 @@ lcs.py handles the longest-common-substring code. It also has a driver to iterat
 
 dataset_utility.py has some minor code that I use for manipulating the database directly in order to see what kind of information might be useful to analysts. Feel free to add functions to it that automate in report tasks or help in parsing the datasets. 
 
+chunking.py holds functions to break up large datasets to improve the speed of lcs.py. 
+
 # TODO
 Not everything here is for 1.0. Some of these things might have already been done. A lot of housekeeping will be wrapped up before 11/3/20. 
 
-- Build out dataset_utility.py for multiple options
-- Integrate dataset_utility.py into emthreat.py
-- Rig up argument parsing in emthreat.py
-- Clean up online_url_fetch in emthreat.py and include a warning when using it
+For 2.0:
 - Implement a utility to graph IPs
 - Implement a utility to check neighboring sites on a domain/IP/netblock
 - Build in an auto-report function to send emails to registrars
 - Optimize LCS.py using suffix trees
-- Add chunking into the database (running LCS on small batches in a merge sort approach, where the X most common URLs are brought to the next level)
 - Optimize the LCS.py driver function
 - Build out additional utilities as needed
