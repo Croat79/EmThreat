@@ -1,6 +1,9 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
 # PROD NOTES
+Build a utility to cure data.
+- Must be built to allow switching between curing for domains and for paths.
+- Will support new-line separated data and CSV files.
 
 The wrong function is currently called in emthreat.py. It should be demo_fetch, not csv_fetch.
 
