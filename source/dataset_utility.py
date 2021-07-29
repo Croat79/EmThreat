@@ -26,21 +26,9 @@ def data_to_excel(data, column):
     df.to_excel(writer,column,index=False)
     writer.save()
 
-# What we want out of intelligence
-# - Domain (everything between // and /. If no second / exists grab split(//)[1])
-# - Software path (everything after /)
-# the above 2 could be used if the known list is not comprehensive enough
-# but we can import that value anyways from a list of known TLDs 
-# - submission_time to understand trends over time 
-# - Details Array containing a dict with ip_address, cidr_block, country
-
-# I'll want a list of IPs on their own anyways
-# 4397 IPs!
-
 # Data Curing Function Should Go Here
 def domain_cure(results, flag, count):
     # List our prevalanet domains.
-    known = [".xyz",".com",".net",".org",".live",".online", ".club",".uk", ".tr", ".pl", ".jp", ".shop", ".ru", ".do", ".mk", ".buzz", ".pro", ".pw", ".app", ".dev", ".br", ".info", ".ga", ".tk", ".ml", ".cf", ".cn", ".id",".cloud",".top",".ir"]
     domains = []
     with open(results) as file:
         urls = []
@@ -53,20 +41,19 @@ def domain_cure(results, flag, count):
         # Enumerate over the URLs.
         for entry,value in enumerate(urls):
             try:
-                # Go over each known and see if it is in the entry URL.
-                for x in known:
-                    if x in value:
-                        #print(value)
-                        if flag.lower() == "domain":
-                            # Split the entry and append the TLD, then break out of loop.
-                            domains.append(value.split(x)[0] + x)
-                            break
-                        elif flag.lower() == "path":
-                            domains.append(value.split(x)[1])
-                            break
+                # Strip out the http://.
+                new_value = value.split("//", 1)[1]
+                #Split on the end of the TLD.
+                new_value = new_value.split("/",1)
+                if flag.lower() == "domain":
+                    # Split the entry and append the TLD, then break out of loop.
+                    domains.append(new_value[0])
+                    break
+                elif flag.lower() == "path":
+                    val_length = len(new_value[1])
+                    if len(new_value[1]) > 2 and len(new_value[1]) < 80:
+                        domains.append(new_value[1])
             except:
                 #If an error happens, ignore the input.
                 pass
-    #TODO: Test that this returns only domain with the 'domain flag'.
-    #TODO: Test that this returns only paths with the 'path flag'.
     return domains
