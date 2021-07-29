@@ -192,7 +192,7 @@ if __name__ == "__main__":
     blocks = chunking.block_gen(results)
     results = driver(words)
     for i in results:
-        print(results)
+        print(sorted(results.items())[:200])
     #print(results)
     end = timer()
     diff = end - start
@@ -206,6 +206,8 @@ if __name__ == "__main__":
     min_output_length = 5
     # Sort our results and then store the top X key/value pairs.
     # Filter results for faster outputs
+    # should no longer need to check for min output length hopefully
+    # or can bake this into LCS so it has a minimum length to accept
     results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
     graph_results = sorted(results.values())[-total_matches:]
     graph_ticks = sorted(results.keys())[-total_matches:]
