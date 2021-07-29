@@ -121,6 +121,8 @@ def demo_fetch(entries, db):
             urls.append(value.strip())
     return urls
 
+# This should not be correct 
+# it will split on https://www. as https:/ and /www. 
 def split_url(url, filter):
     # Helper function to split a URL into the domain or software path.
     tmp = url.split("/", 1)
@@ -137,6 +139,7 @@ def split_url(url, filter):
         print("Invalid filter. Returning full URL.")
         return tmp
 
+#Seems expensive to do when we can just clean data.
 def filter_input(wordlist, url_filter):
     # Goes over a wordlist and splits the urls.
     tmp = []
