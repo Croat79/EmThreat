@@ -1,6 +1,7 @@
 '''
+chunking.py
+
 Chunking will create blocks of X URLs each to run LCS on.
-For testing this is just 10, but in reality it will be 1000.
 Data should be sorted anyways before chunking so similar URLs are ran in the same block.
 The top results from each block are saved to a new list.
 That final list is ran through LCS one last time if desired.
