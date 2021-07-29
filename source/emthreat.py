@@ -7,7 +7,7 @@ from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import sys
 import chunking
-
+import dataset_utility
 
 
 '''
@@ -121,33 +121,6 @@ def demo_fetch(entries, db):
             urls.append(value.strip())
     return urls
 
-# This should not be correct 
-# it will split on https://www. as https:/ and /www. 
-def split_url(url, filter):
-    # Helper function to split a URL into the domain or software path.
-    tmp = url.split("/", 1)
-    if filter == "domain":
-        return tmp[0]
-    elif filter == "path":
-        if len(tmp) > 1:
-            return tmp[1]
-        else:
-            # There is no path.
-            return ''
-    else:
-        # Could return a default value like domain.
-        print("Invalid filter. Returning full URL.")
-        return tmp
-
-#Seems expensive to do when we can just clean data.
-def filter_input(wordlist, url_filter):
-    # Goes over a wordlist and splits the urls.
-    tmp = []
-    for word in wordlist:
-        tmp.append(split_url(word, url_filter))
-    # Removes None values.
-    return list(filter(None, tmp))
-
 ## TODO Implement additional utilities to graph IPs
 def build_graph(results, names, url_filter):
     spacing = 3
@@ -167,12 +140,12 @@ def build_graph(results, names, url_filter):
 
 # Run LCS on blocks.
 def block_lcs(blocks):
-    # Create an array of length blocks.
-    results = [] * len(blocks)
+    # Create an array to store the dictionary outputs.
+    results = []
     for i in blocks:
         # LCS returns a dictionary.
         words = driver(i)
-        results[i].append(words)
+        results.append(words)
     return results
 
 if __name__ == "__main__":
@@ -185,14 +158,14 @@ if __name__ == "__main__":
     db_file = str(args[2])
     url_filter = str(args[3]) # Path or domain
     # Call a function to split and grab either the url or path
-    words = demo_fetch(total_urls, db_file)
-    words = filter_input(words, url_filter)
-
+    words = dataset_utility.domain_cure(db_file, url_filter, total_urls)
+    #print(words[:100])
+    print(len(words))
     start = timer()
-    blocks = chunking.block_gen(results)
-    results = driver(words)
-    for i in results:
-        print(sorted(results.items())[:200])
+    blocks = chunking.block_gen(words)
+    results = block_lcs(blocks)
+    #for i in results:
+    #print(sorted(i.items())[:50])
     #print(results)
     end = timer()
     diff = end - start
