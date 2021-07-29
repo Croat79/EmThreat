@@ -1,10 +1,9 @@
 '''
-Chunking will do the following
-- data should be sorted before chunking to allow better representation
-- creating blocks of size 1000
-- each block will have LCS run on it
-- the top 100 results from each block are saved to a new list
-- finds the top 100 most occuring results
+Chunking will create blocks of X URLs each to run LCS on.
+For testing this is just 10, but in reality it will be 1000.
+Data should be sorted anyways before chunking so similar URLs are ran in the same block.
+The top results from each block are saved to a new list.
+That final list is ran through LCS one last time if desired.
 '''
 import math
 
@@ -18,13 +17,24 @@ def block_gen(results):
     block_total = math.ceil(len(results) / block_length)
     # Create a 2D array to store blocks.
     # [[block1], [block2],...[blockn]]
-    blocks = [] * block_total
+    blocks = [[]]
+    for i in range(block_total-1):
+        new_row = []
+        blocks.append(new_row)
+    #print(f"Blocks: {blocks}")
+    #print("J should be 1 through 50")
     # Go over each new block.
-    for i in range(0, len(results), block_length):
-        # Iterate over the range of i to the block length. 
-        for j in range(i, i + block_length ):
-            # Go to the ith block and append the jth URL from results.
-            blocks[i//block_total].append(results[j])
+    for i in range(len(blocks)):
+        for j in range(1, block_length + 1):
+            #print(f"J: {(block_length * i + j)-1}")
+            # Row 0 + block length means 0-10
+            # Row 1 + block length means 11-21
+            try:
+                blocks[i].append(results[(block_length * i + j) -1])
+            except:
+                #print(f"Error:")
+                #print(block_length * i + j)
+                pass
     # Test output of blocks
     return blocks
 
@@ -51,11 +61,10 @@ def top_100_results(results):
     return results[:100]
 
 
-def driver():
+def driver(results):
     blocks = block_gen(results)
-    results = block_lcs(blocks)
-    sorted_results = sort_block_results(results)
-    final_results = top_100_results(sorted_results)
-    return final_results
-
-    
+    #print(blocks)
+    #results = block_lcs(blocks)
+    #sorted_results = sort_block_results(results)
+    #final_results = top_100_results(sorted_results)
+    return blocks
