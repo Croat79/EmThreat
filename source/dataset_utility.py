@@ -40,7 +40,7 @@ def data_to_excel(data, column):
 # Data Curing Function Should Go Here
 def domain_cure(results, flag, count):
     # List our prevalanet domains.
-    known = [".xyz",".com",".net",".org",".live",".club",".uk", ".info", ".ga", ".tk", ".ml", ".cf"]
+    known = [".xyz",".com",".net",".org",".live",".online", ".club",".uk", ".tr", ".pl", ".jp", ".shop", ".ru", ".do", ".mk", ".buzz", ".pro", ".pw", ".app", ".dev", ".br", ".info", ".ga", ".tk", ".ml", ".cf", ".cn", ".id",".cloud",".top",".ir"]
     domains = []
     with open(results) as file:
         urls = []
@@ -67,4 +67,6 @@ def domain_cure(results, flag, count):
             except:
                 #If an error happens, ignore the input.
                 pass
+    #TODO: Test that this returns only domain with the 'domain flag'.
+    #TODO: Test that this returns only paths with the 'path flag'.
     return domains
