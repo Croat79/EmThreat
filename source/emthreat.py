@@ -27,8 +27,7 @@ python3 EmThreat.py [number of URLs to parse] [db_file] [filter]
 ID = "YOUR PHISHTANK ID"
 headers = {"user-agent": "phishtank/" + str(ID)}
 
-## TODO Break online_url_fetch into different functions
-## TODO Move 'fetches' into their own file.
+
 def online_url_fetch(pages):
     # Fetches recently reported phishing sites.
     page = 1
@@ -121,7 +120,7 @@ def demo_fetch(entries, db):
             urls.append(value.strip())
     return urls
 
-## TODO Implement additional utilities to graph IPs
+# Build a graph from the results and our filter.
 def build_graph(results, names, url_filter):
     spacing = 3
     start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
@@ -149,10 +148,6 @@ def block_lcs(blocks):
     return results
 
 if __name__ == "__main__":
-    # Use the local_url_fetch if you are storing the db. (primarily for demo purposes)
-    # words = local_url_fetch(400, 'verified_online.json')
-    # Otherwise we can write a subset of URLs to a smaller file.
-    # write_urls("test1", words)
     args = sys.argv
     total_urls = int(args[1])
     db_file = str(args[2])
@@ -160,13 +155,19 @@ if __name__ == "__main__":
     # Call a function to split and grab either the url or path
     words = dataset_utility.domain_cure(db_file, url_filter, total_urls)
     #print(words[:100])
-    print(len(words))
+    #print(len(words))
     start = timer()
     blocks = chunking.block_gen(words)
     results = block_lcs(blocks)
-    #for i in results:
-    #print(sorted(i.items())[:50])
-    #print(results)
+    #Uncomment below to store a text file of example data.
+    '''
+     with open("temp.txt", "w+") as file:
+        for i in results:
+            for j, v in i.items():
+                if v > 100 and len(j) > 5:
+                    file.write(f"URL:{j} Count: {v}")
+                    file.write("\n")
+    '''
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
