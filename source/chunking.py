@@ -36,15 +36,3 @@ def block_gen(results):
                 #print(block_length * i + j)
                 pass
     return blocks
-
-# Might not need these.
-def sort_block_results(results):
-    sorted_results = []
-    for i in results:
-        # sort the results to find top 20 and add them to sorted_results
-
-        pass
-    return sorted_results
-
-def top_100_results(results):
-    return results[:100]
