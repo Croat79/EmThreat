@@ -1,4 +1,8 @@
-
+'''
+dataset_utility.py
+This file contains helper functions for interacting with datasets and curing data.
+Will contain generic functions in the future to interact with a broad array of data inputs.
+'''
 def import_json(dataset):
     dataset = 'verified_online.json'
     import json # Handling json file
@@ -11,7 +15,7 @@ def import_json(dataset):
                     except: # Some entries are missing ip_address or are not formatted properly.
                             pass
     print(f"Unique IPs: {len(set(ips))}") # Use a set to find unique IPs
-    # This seems to go over the PhishTank json data to find unique IPs.
+    # Going over the PhishTank json data to find unique IPs.
     return ips
 
 def data_to_excel(data, column):
