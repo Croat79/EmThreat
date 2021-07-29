@@ -35,20 +35,9 @@ def block_gen(results):
                 #print(f"Error:")
                 #print(block_length * i + j)
                 pass
-    # Test output of blocks
     return blocks
 
-def block_lcs(blocks):
-    results = [] * (len(blocks) + 1)
-    for i in blocks:
-        # run lcs on block_gen(results)
-        # results[i] = results
-        pass
-    # return results
-    
-# - the top 20 results from each block are saved to a new list
-# - finds the top 100 most occuring results
-
+# Might not need these.
 def sort_block_results(results):
     sorted_results = []
     for i in results:
@@ -59,12 +48,3 @@ def sort_block_results(results):
 
 def top_100_results(results):
     return results[:100]
-
-
-def driver(results):
-    blocks = block_gen(results)
-    #print(blocks)
-    #results = block_lcs(blocks)
-    #sorted_results = sort_block_results(results)
-    #final_results = top_100_results(sorted_results)
-    return blocks
