@@ -9,7 +9,8 @@ Those will be generalized and moved to dataset_utility.py in 2.0
 # Headers to append to any request.
 ID = "YOUR PHISHTANK ID"
 headers = {"user-agent": "phishtank/" + str(ID)}
-
+from bs4 import BeautifulSoup
+import requests
 
 def online_url_fetch(pages):
     # Fetches recently reported phishing sites.
