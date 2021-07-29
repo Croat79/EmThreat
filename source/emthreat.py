@@ -6,7 +6,7 @@ from lcs import driver
 from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import sys
-
+import chunking
 
 
 
@@ -165,6 +165,15 @@ def build_graph(results, names, url_filter):
     plt.title(f'Phishing Threats by {url_filter.title()}')
     plt.show()
 
+# Run LCS on blocks.
+def block_lcs(blocks):
+    # Create an array of length blocks.
+    results = [] * len(blocks)
+    for i in blocks:
+        # LCS returns a dictionary.
+        words = driver(i)
+        results[i].append(words)
+    return results
 
 if __name__ == "__main__":
     # Use the local_url_fetch if you are storing the db. (primarily for demo purposes)
@@ -180,18 +189,19 @@ if __name__ == "__main__":
     words = filter_input(words, url_filter)
 
     start = timer()
+    blocks = chunking.block_gen(results)
     results = driver(words)
+    for i in results:
+        print(results)
     #print(results)
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
-    # Below is demo code to only print out results that are long and have slashes, indicating paths.
-    '''
-    for p in results:
-        if len(p) > 5 and "/" in p:
-            print(p)
-    '''
+
+    ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
     ## TODO Replace these values with variables that can be overidden by optional flags.
+    ## TODO Put graphing in its own library.
+    '''
     total_matches = 10
     min_output_length = 5
     # Sort our results and then store the top X key/value pairs.
@@ -205,3 +215,4 @@ if __name__ == "__main__":
         if len(v) > 30:
             graph_ticks[i] = v[:30] + "..."
     build_graph(graph_results, graph_ticks, url_filter)
+    '''
