@@ -10,6 +10,12 @@ The goal of this tool is to quickly analyze either the most common domains or th
 
 This is built off of the amazing research done by [UAB's Center for Cyber Security](https://www.uab.edu/cas/thecenter/images/Documents/Identifying-Vulnerable-Websites-by-Analysis-of-Common-Strings-in-Phishing-URLs.pdf)
 
+# What we want out of intelligence
+- Domain & Paths
+- Submission Time to understand trends over time
+  - Such as geographic location or software used in compromised sites.
+- Details Array containing a dict with ip_address, cidr_block, country
+
 ### Dependency list:
 - numpy
 - requests
