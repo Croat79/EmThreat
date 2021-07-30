@@ -1,6 +1,6 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
-# 1.0 Release set for ~~11/3/2020~~
+# 1.0 Release set for 8/1/2021
 
 
 ## ROADMAP
@@ -22,7 +22,6 @@ The goal of this tool is to quickly analyze either the most common domains or th
 Currently set in demo-mode. The 1.0 release will add additional options.
 
 Dependency list:
-- numpy
 - bs4
 - matplotlib
 
