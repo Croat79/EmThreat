@@ -58,6 +58,32 @@ def block_lcs(blocks):
         results.append(words)
     return results
 
+def print_output(results):
+    print(f"EmThreat has found {len(results)} common substrings.")
+    new = [] 
+    # Min frequency and length
+    freq = 100
+    minlength = 5
+    print(f"Searching for substrings that appear more than {freq} times and\
+    are longer than {minlength} characters.")
+    for i in results:
+        for j, v in i.items():
+            if v > freq and len(j) > minlength:
+                new.append([j, v])
+    print(f"{len(new)} results found after cleaning output.")
+    for i in new:
+        print(f"URL:{i[0]} Count: {i[1]}")
+
+# Can create a function to filter results for both save_output
+# and print_output
+def save_output(results, file_name):
+    with open(file_name, "w+") as file:
+        for i in results:
+            for j, v in i.items():
+                if v > 100 and len(j) > 5:
+                    file.write(f"URL:{j} Count: {v}")
+                    file.write("\n")
+        
 if __name__ == "__main__":
     args = sys.argv
     total_urls = int(args[1])
@@ -70,19 +96,11 @@ if __name__ == "__main__":
     start = timer()
     blocks = chunking.block_gen(words)
     results = block_lcs(blocks)
-    #Uncomment below to store a text file of example data.
-    '''
-     with open("temp.txt", "w+") as file:
-        for i in results:
-            for j, v in i.items():
-                if v > 100 and len(j) > 5:
-                    file.write(f"URL:{j} Count: {v}")
-                    file.write("\n")
-    '''
+
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
-
+    print_output(results)
     ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
     ## TODO Replace these values with variables that can be overidden by optional flags.
     ## TODO Put graphing in its own library.
