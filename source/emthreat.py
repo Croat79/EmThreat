@@ -59,13 +59,13 @@ def block_lcs(blocks):
     return results
 
 def print_output(results):
-    print(f"EmThreat has found {len(results)} common substrings.")
+    reslen = sum(len(x) for x in results)
+    print(f"EmThreat has found {reslen} common substrings.")
     new = [] 
     # Min frequency and length
     freq = 100
     minlength = 5
-    print(f"Searching for substrings that appear more than {freq} times and\
-    are longer than {minlength} characters.")
+    print(f"Searching for substrings that appear more than {freq} times and are longer than {minlength} characters.")
     for i in results:
         for j, v in i.items():
             if v > freq and len(j) > minlength:
@@ -87,9 +87,7 @@ def save_output(results, file_name):
 if __name__ == "__main__":
     args = sys.argv
     errormsg = "Please enter a number of URLs, the db_file path, and your URL filter (path, domain)"
-    assert args[1] is not None, errormsg
-    assert args[2] is not None, errormsg
-    assert args[3] is not None, errormsg
+    assert len(args) == 4, errormsg
     total_urls = int(args[1])
     db_file = str(args[2])
     url_filter = str(args[3]) # Path or domain
