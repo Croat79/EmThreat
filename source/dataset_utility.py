@@ -31,6 +31,7 @@ def data_to_excel(data, column):
     writer.save()
 
 # Data Curing Function Should Go Here
+# Will rename this to path_cure later on.
 def domain_cure(results, flag, count):
     # List our prevalanet domains.
     domains = []
@@ -60,4 +61,4 @@ def domain_cure(results, flag, count):
             except:
                 #If an error happens, ignore the input.
                 pass
-    return domains
+    return sorted(domains)
