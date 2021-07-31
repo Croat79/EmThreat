@@ -86,6 +86,10 @@ def save_output(results, file_name):
         
 if __name__ == "__main__":
     args = sys.argv
+    errormsg = "Please enter a number of URLs, the db_file path, and your URL filter (path, domain)"
+    assert args[1] is not None, errormsg
+    assert args[2] is not None, errormsg
+    assert args[3] is not None, errormsg
     total_urls = int(args[1])
     db_file = str(args[2])
     url_filter = str(args[3]) # Path or domain
