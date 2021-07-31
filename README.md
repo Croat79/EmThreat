@@ -1,5 +1,6 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
+
 # About
 Threat Intelligence tool used to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
 
@@ -32,3 +33,5 @@ lcs.py handles the longest-common-substring code. It also has a driver to iterat
 dataset_utility.py has some minor code that I use for manipulating the database directly in order to see what kind of information might be useful to analysts. Feel free to add functions to it that automate in report tasks or help in parsing the datasets. 
 
 chunking.py holds functions to break up large datasets to improve the speed of lcs.py. 
+
+fetch.py holds functions for interacting with PhishTank and pulling data from local files.
