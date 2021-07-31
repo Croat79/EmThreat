@@ -1,4 +1,4 @@
-import numpy as np
+#!/usr/bin/env python3
 import requests
 from time import sleep
 from bs4 import BeautifulSoup
@@ -6,6 +6,10 @@ from lcs import driver
 from time import perf_counter as timer
 import matplotlib.pyplot as plt
 import sys
+import chunking
+import dataset_utility
+
+
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
 for software that they use by analyzing the URLs on PhishTank
@@ -17,122 +21,105 @@ that software may have a new exploit targeting it.
 
 Usage:
 
-python3 EmThreat.py [number of URLs to parse] [db_file]
+python3 EmThreat.py [number of URLs to parse] [db_file] [filter]
 '''
 
-def online_url_fetch(pages):
-    # Fetches recently reported phishing sites.
-    # Do not use too much to prevent heavy site traffic.
-    page = 1
-    # check_url = "https://checkurl.phishtank.com/checkurl/"
-    online_words = []
-    phish_id = 0
-    while page < pages:
-        search_url = f"https://www.phishtank.com/phish_search.php?page={page}&active=y&verified=u"
-        r = requests.get(search_url)
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            try:
-                # Messy but works!
-                for table in soup.find_all('table'):
-                    for row in table.find_all("td"):
-                        # User profiles call user.php instead of full links
-                        # So this filters out stuff wr don't need
-
-                        # Grab id of current phish
-                        if len(row.text) == 7 and row.text != "Unknown":
-                            phish_id = row.text
-                        # Grab the link
-                        if "http" in row.text:
-                            # If it is hidden, we have to go to the page directly
-                            if "..." in row.text:
-                                phish_url = f"https://www.phishtank.com/phish_detail.php?phish_id={phish_id}"
-                                search_phish = requests.get(phish_url)
-                                if search_phish.status_code == 200:
-                                    search_soup = BeautifulSoup(search_phish.text, 'html.parser')
-                                    style = "word-wrap:break-word;"
-                                    res = search_soup.find_all("span", attrs={"style": style})[0].text.split("//")[1]
-                                    online_words.append(res)
-                            else:
-                                # print(row.text.split(" ")[0])
-                                online_words.append(row.text.split(" ")[0].split("//")[1])
-            except:
-                print("No table found.")
-        else:
-            sleep(2)
-        page += 1
-
-
-def local_url_fetch(entries, db):
-    # Fetches phishing URLs from a local database.
-    import json
-    urls = []
-    with open(db) as file:
-        data = json.load(file)
-
-    # We want to split out the https/http since they are too common.
-    for url in range(min(entries, len(data))):
-        urls.append(data[url]['url'].split("//")[1])
-
-    return urls
-
-
+# Mostly a debugging function but can be used in the future to assist with reporting.
 def write_urls(file_name, urls):
     # Write select URLs to a file.
     with open(file_name, "w") as f:
         for url in urls:
             f.write(url + "\n")
 
+# Build a graph from the results and our filter.
+def build_graph(results, names, url_filter):
+    spacing = 3
+    start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
+    # Adding the URLs to the bar chart.
+    for i, x in enumerate(results):
+        plt.barh(spacing * i, height=2, width=x)
+    for j, v in enumerate(names):
+        plt.text(start_of_text, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
+    # Making sure yticks are empty
+    plt.yticks([], [])
+    # Adding out labels
+    plt.ylabel('URLs')
+    plt.xlabel('Count')
+    plt.title(f'Phishing Threats by {url_filter.title()}')
+    plt.show()
 
-def demo_fetch(entries, db):
-    # Pulls URLs from a text file as opposed to json.
-    # Good for demos where we do not have the space to store an entire DB.
-    urls = []
-    with open(db) as file:
-        for count, value in enumerate(file):
-            if count == entries:
-                break
-            urls.append(value.strip())
-    return urls
+# Run LCS on blocks.
+def block_lcs(blocks):
+    # Create an array to store the dictionary outputs.
+    results = []
+    for i in blocks:
+        # LCS returns a dictionary.
+        words = driver(i)
+        results.append(words)
+    return results
 
+def print_output(results):
+    reslen = sum(len(x) for x in results)
+    print(f"EmThreat has found {reslen} common substrings.")
+    new = [] 
+    # Min frequency and length
+    freq = 100
+    minlength = 5
+    print(f"Searching for substrings that appear more than {freq} times and are longer than {minlength} characters.")
+    for i in results:
+        for j, v in i.items():
+            if v > freq and len(j) > minlength:
+                new.append([j, v])
+    print(f"{len(new)} results found after cleaning output.")
+    for i in new:
+        print(f"URL:{i[0]} Count: {i[1]}")
 
+# Can create a function to filter results for both save_output
+# and print_output
+def save_output(results, file_name):
+    with open(file_name, "w+") as file:
+        for i in results:
+            for j, v in i.items():
+                if v > 100 and len(j) > 5:
+                    file.write(f"URL:{j} Count: {v}")
+                    file.write("\n")
+        
 if __name__ == "__main__":
-    # Use the local_url_fetch if you are storing the db.
-    # words = local_url_fetch(400, 'verified_online.json')
-    # Otherwise we can write a subset of URLs to a smaller file.
-    # write_urls("test1", words)
     args = sys.argv
+    errormsg = "Please enter a number of URLs, the db_file path, and your URL filter (path, domain)"
+    assert len(args) == 4, errormsg
     total_urls = int(args[1])
     db_file = str(args[2])
-    words = demo_fetch(total_urls, db_file)
+    url_filter = str(args[3]) # Path or domain
+    # Call a function to split and grab either the url or path
+    words = dataset_utility.domain_cure(db_file, url_filter, total_urls)
+    #print(words[:100])
+    #print(len(words))
     start = timer()
-    results = driver(words)
+    blocks = chunking.block_gen(words)
+    results = block_lcs(blocks)
+
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
+    print_output(results)
+    ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
+    ## TODO Replace these values with variables that can be overidden by optional flags.
+    ## TODO Put graphing in its own library.
     '''
-    for p in results:
-        if len(p) > 5 and "/" in p:
-            print(p)
-    '''
-    # Graphing madness below!
-    N = np.arange(10)
-    # These list comprehensions are crazy!
-    graph_results = sorted([results[x] for x in results if len(x) > 5 and "/" in x])[-10:]
-    graph_ticks = sorted([x for x in results if len(x) > 5 and "/" in x])[-10:]
+    total_matches = 10
+    min_output_length = 5
+    # Sort our results and then store the top X key/value pairs.
+    # Filter results for faster outputs
+    # should no longer need to check for min output length hopefully
+    # or can bake this into LCS so it has a minimum length to accept
+    results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
+    graph_results = sorted(results.values())[-total_matches:]
+    graph_ticks = sorted(results.keys())[-total_matches:]
+    #print(results)
     # If a URL is too long...
     for i, v in enumerate(graph_ticks):
         if len(v) > 30:
             graph_ticks[i] = v[:30] + "..."
-
-    spacing = 1
-    # Adding the URLs to the bar chart.
-    for i, x in enumerate(graph_results):
-        plt.bar(spacing * i, height=x, tick_label="")
-    # This was a cool solution but the URLs were still too long.
-    # plt.xticks(N, graph_ticks, rotation=70)
-    plt.legend(graph_ticks)
-    plt.ylabel('Count')
-    plt.xlabel('URLs')
-    plt.title('Phishing URLs')
-    plt.show()
+    build_graph(graph_results, graph_ticks, url_filter)
+    '''

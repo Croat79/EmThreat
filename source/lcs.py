@@ -1,46 +1,24 @@
+
 '''
+lcs.py
 This code is used to handle the longest common substring algorithm and a driver that will go over a wordlist
-and compute a dictionary containing the most common substrings. 
+and compute a dictionary containing the most common substrings using SequenceMatcher.
+
+The driver function is used to keep track of URLs.
 '''
-def fast_lcs(first, second):
-    m = len(first)
-    n = len(second)
-    # Build a 2D array to store the comparison values.
-    match_matrix = [[0 for x in range(n+1)] for y in range(m+1)]
-    start, end = 0, 0
-    length = 0
-    skip = False
 
-    # Go over the first word
-    for i in range(1, m + 1):
-        # Go over the second word
-        for j in range(1, n + 1):
-            # If the previous characters match in both words
-            if first[i-1] == second[j-1]:
-                # Set the current ij value to an increment of the previous.
-                match_matrix[i][j] = match_matrix[i-1][j-1] + 1
-                # If this value is greater than our stored length
-                # then the new substring is the longest
-                if length < match_matrix[i][j]:
-                    length = match_matrix[i][j]
-                    start, end = i, j
+# SequenceMatcher implementation to return the longest match.
+def lcs(s1, s2):
+    from difflib import SequenceMatcher
+    seq = SequenceMatcher(None, s1, s2)
+    lcs = seq.find_longest_match(0, len(s1),0, len(s2))
+    if (lcs.size != 0):
+    	return str(s1[lcs.a: lcs.a + lcs.size])
+    else:
+    	return ""
 
-    # If length is 0, we do not need to perform the while loop
-    # and can just return a string that says '0'
-    if length == 0:
-        return '0'
-
-    substring = ""
-    # Go diagonally through the 2d array to find the values of the
-    # longest common substring.
-    while match_matrix[start][end] > 0:
-        substring += first[start-1]
-        start, end = start - 1, end - 1
-
-    # Flip the result since it is backwards.
-    return substring[::-1]
-
-
+# Maintaining 2 dictionaries in the driver.
+# As well as an n-length list using a n^2 loop.
 def driver(wordlist):
     urls = {}
     tried = {}
@@ -59,7 +37,7 @@ def driver(wordlist):
 
             # Store the longest common substring.
             # Will either be a string or '0'
-            holder = fast_lcs(i, j)
+            holder = lcs(i, j)
 
             # If the substring already exists we increment it
             # otherwise we insert it.
@@ -69,5 +47,3 @@ def driver(wordlist):
                 urls[holder] = 1
 
     return urls
-
-
