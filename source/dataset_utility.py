@@ -42,6 +42,7 @@ def path_clean(urls):
     for value in urls:
         try:
             # Strip out the http://.
+            # We can move this part to a function too
             new_value = value.split("//", 1)[1]
             #Split on the end of the TLD.
             new_value = new_value.split("/",1)
