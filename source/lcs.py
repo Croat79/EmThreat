@@ -23,21 +23,21 @@ def driver(wordlist):
     urls = {}
     tried = {}
     # Goes over the wordlist to find all combinations of words that we will run across.
-    for i in wordlist:
-        for j in wordlist:
+    for word1 in wordlist:
+        for word2 in wordlist:
             # Ignore duplicates.
-            if i == j:
+            if word1 == word2:
                 continue
             # And inversions.
-            if (tried.get(i + j) is not None) or (tried.get(j + i) is not None):
+            if (tried.get(word1 + word2) is not None) or (tried.get(word2 + word1) is not None):
                 continue
             else:
                 # Add i=j and j=i to the dictionary to make sure we don't call LCS on it later.
-                tried[i + j], tried[j + i] = 1, 1
+                tried[word1 + word2], tried[word2 + word1] = 1, 1
 
             # Store the longest common substring.
             # Will either be a string or '0'
-            holder = lcs(i, j)
+            holder = lcs(word1, word2)
 
             # If the substring already exists we increment it
             # otherwise we insert it.
