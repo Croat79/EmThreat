@@ -58,10 +58,20 @@ def remove_parameters(url):
 
 def remove_websites(url):
     # Cleaning up the URL by removing websites.
-    sites = ["http://", "https://"]
+    sites = ["http://", "https://", "https//", "http//"]
     for pretext in sites:
         if pretext in url:
             return url.split(pretext)[0]
+    return url
+
+def find_emails(url):
+    import re
+    # Search for emails
+    emails = re.findall("([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)", url)
+    if len(emails) > 0:
+        # If we have an email, split on the first one.
+        # Then return everything in front of it.
+        return url.split(emails[0])[0]
     return url
 
 # Pull out just the paths of URLs.
@@ -80,10 +90,11 @@ def path_clean(urls):
                 split_url = url.split("/", 1)[1]
                 param_url = remove_parameters(split_url)
                 web_url = remove_websites(param_url)
+                email_url = find_emails(web_url)
 
-                url_check = check_path(web_url)
+                url_check = check_path(email_url)
                 if url_check:
-                    paths.append(web_url)
+                    paths.append(email_url)
         except:
             #If an error happens, ignore the input.
             pass
