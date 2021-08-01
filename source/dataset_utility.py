@@ -30,35 +30,25 @@ def data_to_excel(data, column):
     df.to_excel(writer,column,index=False)
     writer.save()
 
-# Data Curing Function Should Go Here
-# Will rename this to path_cure later on.
-def domain_cure(results, flag, count):
-    # List our prevalanet domains.
-    domains = []
-    with open(results) as file:
-        urls = []
-        # Go over the input file and only add the count we want to urls array.
-        data = file.readlines()
-        for entry, value in enumerate(data):
-            if entry >= count:
-                break
-            urls.append(value.strip())
-        # Enumerate over the URLs.
-        for entry,value in enumerate(urls):
-            try:
-                # Strip out the http://.
-                new_value = value.split("//", 1)[1]
-                #Split on the end of the TLD.
-                new_value = new_value.split("/",1)
-                if flag.lower() == "domain":
-                    # Split the entry and append the TLD, then break out of loop.
-                    domains.append(new_value[0])
-                    break
-                elif flag.lower() == "path":
-                    val_length = len(new_value[1])
-                    if len(new_value[1]) > 2 and len(new_value[1]) < 80:
-                        domains.append(new_value[1])
-            except:
-                #If an error happens, ignore the input.
-                pass
-    return sorted(domains)
+
+# Pull out just the paths of URLs.
+def path_clean(urls):
+    # List our prevalent paths.
+    paths = []
+    min_length = 2
+    max_length = 80
+       
+    # Go over URLs array and only append values that meet our criteria.
+    for value in urls:
+        try:
+            # Strip out the http://.
+            new_value = value.split("//", 1)[1]
+            #Split on the end of the TLD.
+            new_value = new_value.split("/",1)
+            val_length = len(new_value[1])
+            if len(new_value[1]) > min_length and len(new_value[1]) < max_length:
+                paths.append(new_value[1])
+        except:
+            #If an error happens, ignore the input.
+            pass
+    return sorted(paths)
