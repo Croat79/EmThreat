@@ -1,7 +1,7 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
 
-# About EmThreat 1.0
+# About EmThreat 1.1
 Threat Intelligence tool utilizing a CLI interface to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
 
 The goal of this tool is to quickly analyze the most common paths of phishing websites, which can be used to classify recently vulnerable software and provide immediate warning to security teams before wide-scale attacks are reported.
@@ -19,16 +19,24 @@ This is built off of the amazing research done by [UAB's Center for Cyber Securi
 - matplotlib
 
 ### Usage:
-`python3 emthreat.py [number of urls] [input file] {domain, path}`
+`usage: emthreat.py [-h] [-f F] [-c C] [-i {csv,json,txt}] -o {print,save}
+                   [-n N]`
 
-Specify the number of URLs you want to scan out of a new line separated list of URLs, the path to the file, and whether you want to output the most common domains or paths.
+optional arguments:
+
+  - -h, --help         show this help message and exit 
+  - -f |               db_file: The file that URLs will be read from.
+  - -c |               total_urls: The amount of URLs that will be processed.
+  - -i | {csv,json,txt} | Input: Determines the file type of the database used.
+  - -o | {print,save} |   Output: Determines if saved to a file or printed to screen.
+  - -n |              Name: The name that the report file will be saved as.
 
 ## Contributing
-emthreat.py is the main file, it handles the processing of information from a locally downloaded database. In the future this data handling can be done in a separate library as more features are added.
+emthreat.py is the main driver file that handles arguments, calls functions from supporting libraries, and executes the output.
 
 lcs.py handles the longest-common-substring code. It also has a driver to iterate over a combination of every possible input. This needs to have a suffix tree implementation added to considerably speed up  the n\*m computation time.
 
-dataset_utility.py has some minor code that I use for manipulating the database directly in order to see what kind of information might be useful to analysts. Feel free to add functions to it that automate in report tasks or help in parsing the datasets. 
+dataset_utility.py cleans up the URLs and has code for interacting with XLS files.
 
 chunking.py holds functions to break up large datasets to improve the speed of lcs.py. 
 
