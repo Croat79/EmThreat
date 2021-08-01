@@ -23,12 +23,17 @@ This is built off of the amazing research done by [UAB's Center for Cyber Securi
                    [-n N]`
 
 optional arguments:
+
   -h, --help         show this help message and exit
+  
   -f F               db_file: The file that URLs will be read from.
+  
   -c C               total_urls: The amount of URLs that will be processed.
+  
   -i {csv,json,txt}  Input: Determines the file type of the database used.
-  -o {print,save}    Output: Determines if saved to a file or printed to
-                     screen.
+  
+  -o {print,save}    Output: Determines if saved to a file or printed to screen.
+  
   -n N               Name: The name that the report file will be saved as.
 
 ## Contributing
