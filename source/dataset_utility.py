@@ -49,6 +49,21 @@ def check_path(url):
     else:
         return False
 
+def remove_parameters(url):
+    # Cleaning up the URL by removing parameters.
+    params = "?"
+    if params in url:
+        return url.split(params)[0]
+    return url
+
+def remove_websites(url):
+    # Cleaning up the URL by removing websites.
+    sites = ["http://", "https://"]
+    for pretext in sites:
+        if pretext in url:
+            return url.split(pretext)[0]
+    return url
+
 # Pull out just the paths of URLs.
 def path_clean(urls):
     # List our prevalent paths.
@@ -63,9 +78,12 @@ def path_clean(urls):
             if url_path:
                 #Split on the end of the TLD.
                 split_url = url.split("/", 1)[1]
-                url_check = check_path(split_url)
+                param_url = remove_parameters(split_url)
+                web_url = remove_websites(param_url)
+
+                url_check = check_path(web_url)
                 if url_check:
-                    paths.append(split_url)
+                    paths.append(web_url)
         except:
             #If an error happens, ignore the input.
             pass
