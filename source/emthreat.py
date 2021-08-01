@@ -75,7 +75,7 @@ def loop_dict(results):
     print(f"EmThreat has found {reslen} common substrings.")
     # Min frequency and length
     new_results = []
-    freq = 100
+    freq = 10
     minlength = 5
     print(f"Searching for substrings that appear more than {freq} times and are longer than {minlength} characters.")
     for pair in results:
@@ -84,7 +84,22 @@ def loop_dict(results):
             # If the URL appears enough times and is longer than a few characters.
             if count > freq and len(value) > minlength:
                 new_results.append([value, count])
-    # Returns 2D array.
+    
+    # Send 2D array to directory_elim
+    directory_only = directory_elim(new_results)
+    # Returns 2D array of paths that only have directories and their counts. 
+    return directory_only
+
+def directory_elim(results):
+    # Input is a 2D array
+    # [value, count]
+    new_results = []
+    for pair in results:
+        path = pair[0]
+        # If the path contains a directory level, append it. 
+        is_directory_level = dataset_utility.high_level(path)
+        if is_directory_level:
+            new_results.append(pair)
     return new_results
 
 if __name__ == "__main__":
@@ -120,6 +135,7 @@ if __name__ == "__main__":
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
+
     # Handle what we do after reaching our results.
     if report_output == "print":
         print_output(results)

@@ -30,25 +30,42 @@ def data_to_excel(data, column):
     df.to_excel(writer,column,index=False)
     writer.save()
 
+# Only grab high level paths.
+def high_level(url):
+    dir_count = 3
+    # Now if the URL has 3 or more /'s, we want it.
+    total = url.count("/")
+    if total >= dir_count:
+        return True
+    return False
+
+# Checks path against our criteria.
+def check_path(url):
+    min_length = 5
+    max_length = 80
+    # If the length is between what we want, return it.
+    if len(url) > min_length and len(url) < max_length:
+        return True
+    else:
+        return False
 
 # Pull out just the paths of URLs.
 def path_clean(urls):
     # List our prevalent paths.
-    paths = []
-    min_length = 2
-    max_length = 80
-       
+    paths = [] 
     # Go over URLs array and only append values that meet our criteria.
     for value in urls:
         try:
-            # Strip out the http://.
-            # We can move this part to a function too
-            new_value = value.split("//", 1)[1]
-            #Split on the end of the TLD.
-            new_value = new_value.split("/",1)
-            val_length = len(new_value[1])
-            if len(new_value[1]) > min_length and len(new_value[1]) < max_length:
-                paths.append(new_value[1])
+            # Remove https://
+            url = value.split("//", 1)[1]
+            url_path = high_level(url)
+
+            if url_path:
+                #Split on the end of the TLD.
+                split_url = url.split("/", 1)[1]
+                url_check = check_path(split_url)
+                if url_check:
+                    paths.append(split_url)
         except:
             #If an error happens, ignore the input.
             pass
