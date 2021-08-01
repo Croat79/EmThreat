@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import requests
-from time import sleep
-from bs4 import BeautifulSoup
+import sys
+import argparse
+
 from lcs import driver
 from time import perf_counter as timer
-import matplotlib.pyplot as plt
-import sys
+
+
 import chunking
 import dataset_utility
+import fetch
 
+import matplotlib.pyplot as plt
 
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
@@ -19,17 +22,8 @@ Many websites have similar URL paths because they use the same software
 so if many URLs pop up on PhishTank that match the ones used by a web admin,
 that software may have a new exploit targeting it.
 
-Usage:
-
-python3 EmThreat.py [number of URLs to parse] [db_file] [filter]
+python3 EmThreat.py --help
 '''
-
-# Mostly a debugging function but can be used in the future to assist with reporting.
-def write_urls(file_name, urls):
-    # Write select URLs to a file.
-    with open(file_name, "w") as f:
-        for url in urls:
-            f.write(url + "\n")
 
 # Build a graph from the results and our filter.
 def build_graph(results, names, url_filter):
@@ -52,57 +46,86 @@ def build_graph(results, names, url_filter):
 def block_lcs(blocks):
     # Create an array to store the dictionary outputs.
     results = []
-    for i in blocks:
+    for block in blocks:
         # LCS returns a dictionary.
-        words = driver(i)
+        words = driver(block)
         results.append(words)
     return results
 
+# Prints out results to the command line.
 def print_output(results):
-    reslen = sum(len(x) for x in results)
+    # Store the results that we want in a new 2D array.
+    new_results = loop_dict(results) 
+    print(f"{len(new_results)} results found after cleaning output.")
+    for pair in new_results:
+        print(f"URL:{pair[0]} Count: {pair[1]}")
+
+# Saves output to a file.
+def save_output(results, file_name):
+    with open(file_name, "w+") as file:
+        new_results = loop_dict(results)
+        for pair in new_results:
+                file.write(f"URL:{pair[0]} Count: {pair[1]}\n")
+        print(f"Wrote {len(new_results)} to {file_name}")
+
+# Loops over a dictionary to get URLs that meet our basic criteria.
+def loop_dict(results):
+    # Grab total of all dictionaries.
+    reslen = sum(len(block) for block in results) 
     print(f"EmThreat has found {reslen} common substrings.")
-    new = [] 
     # Min frequency and length
+    new_results = []
     freq = 100
     minlength = 5
     print(f"Searching for substrings that appear more than {freq} times and are longer than {minlength} characters.")
-    for i in results:
-        for j, v in i.items():
-            if v > freq and len(j) > minlength:
-                new.append([j, v])
-    print(f"{len(new)} results found after cleaning output.")
-    for i in new:
-        print(f"URL:{i[0]} Count: {i[1]}")
+    for pair in results:
+        # For each pair in the dictionary.
+        for value, count in pair.items():
+            # If the URL appears enough times and is longer than a few characters.
+            if count > freq and len(value) > minlength:
+                new_results.append([value, count])
+    # Returns 2D array.
+    return new_results
 
-# Can create a function to filter results for both save_output
-# and print_output
-def save_output(results, file_name):
-    with open(file_name, "w+") as file:
-        for i in results:
-            for j, v in i.items():
-                if v > 100 and len(j) > 5:
-                    file.write(f"URL:{j} Count: {v}")
-                    file.write("\n")
-        
 if __name__ == "__main__":
-    args = sys.argv
-    errormsg = "Please enter a number of URLs, the db_file path, and your URL filter (path, domain)"
-    assert len(args) == 4, errormsg
-    total_urls = int(args[1])
-    db_file = str(args[2])
-    url_filter = str(args[3]) # Path or domain
-    # Call a function to split and grab either the url or path
-    words = dataset_utility.domain_cure(db_file, url_filter, total_urls)
-    #print(words[:100])
-    #print(len(words))
-    start = timer()
-    blocks = chunking.block_gen(words)
-    results = block_lcs(blocks)
+    # Using ArgumentParser to handle our arguments.
+    parser = argparse.ArgumentParser(description='EmThreat 1.1 is a tool to help web admins notice spikes in phishing activity for software \
+        that they use by analyzing the URLs on PhishTankand comparing them to URLs used by the admin.')
+    group = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument('-f', help="db_file: The file that URLs will be read from.")
+    parser.add_argument('-c', help="total_urls: The amount of URLs that will be processed.")
+    parser.add_argument('-i', default="txt", choices=["csv", "json", "txt"], help="Input: Determines the file type of the database used.")
+    group.add_argument('-o', default = "print", choices=["print", "save"], help="Output: Determines if saved to a file or printed to screen.")
+    parser.add_argument('-n', default ="report.txt", help="Name: The name that the report file will be saved as.")
+    args = parser.parse_args()
 
+    # Variables to store main actions we will take.
+    total_urls = int(args.c)
+    db_file = str(args.f)
+    db_type = str(args.i)
+    # Report type and output.
+    report_output = str(args.o)
+    report_name = str(args.n)
+
+    # An array of URLs extracted from supported file types.
+    urls = fetch.open_database(db_file, total_urls, db_type)
+
+    # Grabs just the paths from the URLs.
+    words = dataset_utility.path_clean(urls)
+    start = timer()
+    # Turns words into blocks.
+    blocks = chunking.block_gen(words)
+    # Runs LCS on each block.
+    results = block_lcs(blocks)
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
-    print_output(results)
+    # Handle what we do after reaching our results.
+    if report_output == "print":
+        print_output(results)
+    else:
+        save_output(results, report_name)
+    # Graphing output will become an option after 1.5 or so.
     ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
     ## TODO Replace these values with variables that can be overidden by optional flags.
     ## TODO Put graphing in its own library.
