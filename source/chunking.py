@@ -19,19 +19,16 @@ def block_gen(results):
     # Create a 2D array to store blocks.
     # [[block1], [block2],...[blockn]]
     blocks = [[]]
-    for i in range(block_total-1):
+    for index in range(block_total-1):
         new_row = []
         blocks.append(new_row)
-    #print(f"Blocks: {blocks}")
-    #print("J should be 1 through 50")
     # Go over each new block.
-    for i in range(len(blocks)):
-        for j in range(1, block_length + 1):
-            #print(f"J: {(block_length * i + j)-1}")
+    for block in range(len(blocks)):
+        for index in range(1, block_length + 1):
             # Row 0 + block length means 0-10
             # Row 1 + block length means 11-21
             try:
-                blocks[i].append(results[(block_length * i + j) -1])
+                blocks[block].append(results[(block_length * block + index) -1])
             except:
                 #print(f"Error:")
                 #print(block_length * i + j)
