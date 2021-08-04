@@ -1,7 +1,7 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
 
-# About EmThreat 1.1
+# About EmThreat 1.3
 Threat Intelligence tool utilizing a CLI interface to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
 
 The goal of this tool is to quickly analyze the most common paths of phishing websites, which can be used to classify recently vulnerable software and provide immediate warning to security teams before wide-scale attacks are reported.

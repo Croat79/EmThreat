@@ -104,7 +104,7 @@ def directory_elim(results):
 
 if __name__ == "__main__":
     # Using ArgumentParser to handle our arguments.
-    parser = argparse.ArgumentParser(description='EmThreat 1.1 is a tool to help web admins notice spikes in phishing activity for software \
+    parser = argparse.ArgumentParser(description='EmThreat 1.3 is a tool to help web admins notice spikes in phishing activity for software \
         that they use by analyzing the URLs on PhishTankand comparing them to URLs used by the admin.')
     group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument('-f', help="db_file: The file that URLs will be read from.")
