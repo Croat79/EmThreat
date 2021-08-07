@@ -50,6 +50,7 @@ def block_lcs(blocks):
         # LCS returns a dictionary.
         words = driver(block)
         results.append(words)
+    # Returns [{url:count}, {url2:count2},...]
     return results
 
 # Prints out results to the command line.
@@ -128,10 +129,12 @@ if __name__ == "__main__":
     # Grabs just the paths from the URLs.
     words = dataset_utility.path_clean(urls)
     start = timer()
+
     # Turns words into blocks.
     blocks = chunking.block_gen(words)
     # Runs LCS on each block.
     results = block_lcs(blocks)
+
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')

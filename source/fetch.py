@@ -56,3 +56,10 @@ def open_database(db, entries, filetype):
     return urls
 
 
+# Check exploit DB for a software type
+# check_exploitdb("wordpress")
+# https://www.exploit-db.com/search?q=wordpress
+# grab each date to see the latest vulns
+# then print out those vulns
+def check_exploitdb():
+    pass

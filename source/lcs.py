@@ -1,10 +1,10 @@
 
 '''
 lcs.py
-This code is used to handle the longest common substring algorithm and a driver that will go over a wordlist
-and compute a dictionary containing the most common substrings using SequenceMatcher.
+This code is used to handle the longest common substring algorithm 
+and a driver that will go over an input of URL paths.
 
-The driver function is used to keep track of URLs.
+The result is a dictionary of paths and the count of times they have been seen.
 '''
 
 # SequenceMatcher implementation to return the longest match.
@@ -19,23 +19,29 @@ def lcs(s1, s2):
 
 
 def lcs_driver(combos):
+    # This is a driver that runs in async with other threads.
+    # It will run over a subset of the combo list.
     for pair in combos:
+        # For each combo, we grab the 2 URLs in it.
         word1 = pair[0]
         word2 = pair[1]
         # Ignore the same value
         if word1 == word2:
             pass
-        # And inversions.
+        # And inversions. This way we dont compute the same pair in reverse order.
         if (tried.get(word1 + word2) is not None) or (tried.get(word2 + word1) is not None):
             continue
         else:
             # Add i=j and j=i to the dictionary to make sure we don't call LCS on it later.
             tried[word1 + word2], tried[word2 + word1] = 1, 1      
 
+        # Run the actual LCS function on this.
         holder = lcs(word1, word2) 
 
+        # If we have already seen a substring, its count is incremented.
         if urls.get(holder) is not None:
             urls[holder] += 1
+        # Otherwise it is added.
         else:
             urls[holder] = 1
 
@@ -44,6 +50,8 @@ def lcs_driver(combos):
 # Maintaining 2 dictionaries in the driver.
 # As well as an n-length list using a n^2 loop.
 def driver(wordlist):
+    # Using globals so the async threads update the dictionaries
+    # otherwise we could get race conditions
     global urls
     global tried
 
@@ -57,12 +65,30 @@ def driver(wordlist):
     # Cut combos into a list of n/10
     # Run pool.apply_async on each slide
 
-    pool = ThreadPool(processes=5)
-    slices = len(combos)//5
-    async_result = pool.apply_async(lcs_driver(combos[:slices]))
-    async_result = pool.apply_async(lcs_driver(combos[slices:slices*2]))
-    async_result = pool.apply_async(lcs_driver(combos[slices*2:slices*3]))
-    async_result = pool.apply_async(lcs_driver(combos[slices*3:slices*4]))
-    async_result = pool.apply_async(lcs_driver(combos[slices:]))
+    # Now that this works, lets dynamically create threads based 
+    # on thread count + slices
+    threads = 20
+    slices = len(combos)//threads
+
+    pool = ThreadPool(processes=threads)
+
+    #Create our threads..except the last one.
+    for thread in range(threads - 1):
+        # This will give us 10 * 0 on the first thread
+        # and 10 * 1 on the second
+        # etc
+        current = slices * thread
+        next_section = slices * (thread + 1)
+        #print(f"{current}:{next_section}")
+        # Each thread will be [0:10], [10:20], etc 
+        # with the number being based on length / 10
+        pool.apply_async(lcs_driver(combos[current:next_section]))
+
+
+    # Create the final thread
+    pool.apply_async(lcs_driver(combos[slices:]))
+
+    # We could store the result of these async threads in a variable
+    # but nothing is being returned because we use globals.
     
     return urls
