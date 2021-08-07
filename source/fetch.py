@@ -5,15 +5,16 @@ This library handles fetching information from online, downloading databses, etc
 It also contains generic functions for interacting with data. 
 '''
 import json
-# Headers to append to any request.
-ID = "YOUR PHISHTANK ID"
-headers = {"user-agent": "phishtank/" + str(ID)}
 from bs4 import BeautifulSoup
 import requests
+
+ID = "YOUR PHISHTANK ID"
 
 ## Testing these functions in 1.2
 # Downloads fresh database (either CSV or JSON) from PhishTank.
 def download_new_database(filetype, filename):
+    # Headers to append to any request.
+    headers = {"user-agent": "phishtank/" + str(ID)}
     # Fetches recently reported phishing sites.
     print("Warning: Use web crawling responsibly and ensure you enter your Phishtank ID.")
     url = "http://data.phishtank.com/data/online-valid" + str(filetype)
@@ -54,5 +55,3 @@ def open_database(db, entries, filetype):
             # Otherwise append normally.
             urls = loop_data(file, entries, False)
     return urls
-
-

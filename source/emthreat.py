@@ -50,6 +50,7 @@ def block_lcs(blocks):
         # LCS returns a dictionary.
         words = driver(block)
         results.append(words)
+    # Returns [{url:count}, {url2:count2},...]
     return results
 
 # Prints out results to the command line.
@@ -104,7 +105,7 @@ def directory_elim(results):
 
 if __name__ == "__main__":
     # Using ArgumentParser to handle our arguments.
-    parser = argparse.ArgumentParser(description='EmThreat 1.1 is a tool to help web admins notice spikes in phishing activity for software \
+    parser = argparse.ArgumentParser(description='EmThreat 1.3 is a tool to help web admins notice spikes in phishing activity for software \
         that they use by analyzing the URLs on PhishTankand comparing them to URLs used by the admin.')
     group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument('-f', help="db_file: The file that URLs will be read from.")
@@ -128,10 +129,12 @@ if __name__ == "__main__":
     # Grabs just the paths from the URLs.
     words = dataset_utility.path_clean(urls)
     start = timer()
+
     # Turns words into blocks.
     blocks = chunking.block_gen(words)
     # Runs LCS on each block.
     results = block_lcs(blocks)
+
     end = timer()
     diff = end - start
     print(f'Finished in {diff / 60} minutes\n')
