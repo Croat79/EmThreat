@@ -1,5 +1,7 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
+# Project Future
+It has been 2 months since I updated EmThreat to 1.3. There are plenty of features left on my list but the consistent work I need to put into this to reach them goes beyond what I can commit to at the moment. I have multiple hobbies and projects that I am working on, so putting forth 5 hours a week into this utility adds up. I will be re-visiting my roadmap and simplying the features to create a single, cohesive threat intelligence tool. Mainly, pulling as much information as possible out of paths and domains while not overwhelming the user with switches.
 
 # About EmThreat 1.3
 Threat Intelligence tool utilizing a CLI interface to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
