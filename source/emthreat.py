@@ -4,6 +4,7 @@ import sys
 import argparse
 
 from lcs import driver
+from chunking import BLOCK_SIZE
 from time import perf_counter as timer
 
 
@@ -12,6 +13,7 @@ import dataset_utility
 import fetch
 
 import matplotlib.pyplot as plt
+from multiprocessing.pool import ThreadPool
 
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
@@ -24,6 +26,8 @@ that software may have a new exploit targeting it.
 
 python3 EmThreat.py --help
 '''
+
+THREAD_COUNT = BLOCK_SIZE // 2
 
 # Build a graph from the results and our filter.
 def build_graph(results, names, url_filter):
@@ -44,17 +48,16 @@ def build_graph(results, names, url_filter):
 
 # Run LCS on blocks.
 def block_lcs(blocks):
-    start = timer()
     # Create an array to store the dictionary outputs.
     results = []
+    threads = THREAD_COUNT
+    pool = ThreadPool(processes=threads)
     for block in blocks:
-        # LCS returns a dictionary.
-        words = driver(block)
-        results.append(words)
+        # driver returns a dictionary of URLs from lcs.py.
+        async_result = pool.apply_async(driver, (block,))
+        result = async_result.get()
+        results.append(result)
     # Returns [{url:count}, {url2:count2},...]
-    end = timer()
-    diff = end - start
-    print(f'Finished block_lcs in {diff / 60} minutes\n') 
     return results
 
 # Prints out results to the command line.
