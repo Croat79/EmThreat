@@ -44,6 +44,7 @@ def build_graph(results, names, url_filter):
 
 # Run LCS on blocks.
 def block_lcs(blocks):
+    start = timer()
     # Create an array to store the dictionary outputs.
     results = []
     for block in blocks:
@@ -51,6 +52,9 @@ def block_lcs(blocks):
         words = driver(block)
         results.append(words)
     # Returns [{url:count}, {url2:count2},...]
+    end = timer()
+    diff = end - start
+    print(f'Finished block_lcs in {diff / 60} minutes\n') 
     return results
 
 # Prints out results to the command line.

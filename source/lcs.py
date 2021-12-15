@@ -6,6 +6,7 @@ and a driver that will go over an input of URL paths.
 
 The result is a dictionary of paths and the count of times they have been seen.
 '''
+from time import perf_counter as timer
 
 # SequenceMatcher implementation to return the longest match.
 def lcs(s1, s2):
@@ -50,6 +51,7 @@ def lcs_driver(combos):
 # Maintaining 2 dictionaries in the driver.
 # As well as an n-length list using a n^2 loop.
 def driver(wordlist):
+    start = timer()
     # Using globals so the async threads update the dictionaries
     # otherwise we could get race conditions
     global urls
@@ -67,7 +69,7 @@ def driver(wordlist):
 
     # Now that this works, lets dynamically create threads based 
     # on thread count + slices
-    threads = 20
+    threads = 5
     slices = len(combos)//threads
 
     pool = ThreadPool(processes=threads)
@@ -90,5 +92,7 @@ def driver(wordlist):
 
     # We could store the result of these async threads in a variable
     # but nothing is being returned because we use globals.
-    
+    end = timer()
+    diff = end - start
+    print(f'LCS block finished in {diff / 60} minutes\n') 
     return urls

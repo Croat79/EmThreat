@@ -7,6 +7,7 @@ It also contains generic functions for interacting with data.
 import json
 from bs4 import BeautifulSoup
 import requests
+from time import perf_counter as timer
 
 ID = "YOUR PHISHTANK ID"
 
@@ -42,6 +43,8 @@ def loop_data(file, entries, csv):
 
 # Function to open a database based on the file type.
 def open_database(db, entries, filetype):
+    start = timer()
+
     urls = []
     with open(db) as file:
         if filetype == "json":
@@ -54,4 +57,7 @@ def open_database(db, entries, filetype):
         else:
             # Otherwise append normally.
             urls = loop_data(file, entries, False)
+    end = timer()
+    diff = end - start
+    print(f'Database opened in {diff / 60} minutes\n') 
     return urls

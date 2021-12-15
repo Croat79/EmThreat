@@ -3,6 +3,7 @@ dataset_utility.py
 This file contains helper functions for interacting with datasets and curing data.
 Will contain generic functions in the future to interact with a broad array of data inputs.
 '''
+from time import perf_counter as timer
 def import_json(dataset):
     dataset = 'verified_online.json'
     import json # Handling json file
@@ -76,6 +77,7 @@ def find_emails(url):
 
 # Pull out just the paths of URLs.
 def path_clean(urls):
+    start = timer()
     # List our prevalent paths.
     paths = [] 
     # Go over URLs array and only append values that meet our criteria.
@@ -98,4 +100,7 @@ def path_clean(urls):
         except:
             #If an error happens, ignore the input.
             pass
+    end = timer()
+    diff = end - start
+    print(f'Path Clean finished in {diff / 60} minutes\n') 
     return sorted(paths)
