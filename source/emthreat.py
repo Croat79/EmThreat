@@ -29,22 +29,35 @@ python3 EmThreat.py --help
 
 THREAD_COUNT = BLOCK_SIZE // 2
 
-# Build a graph from the results and our filter.
-def build_graph(results, names, url_filter):
-    spacing = 3
-    start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
-    # Adding the URLs to the bar chart.
-    for i, x in enumerate(results):
-        plt.barh(spacing * i, height=2, width=x)
-    for j, v in enumerate(names):
-        plt.text(start_of_text, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
-    # Making sure yticks are empty
-    plt.yticks([], [])
-    # Adding out labels
-    plt.ylabel('URLs')
-    plt.xlabel('Count')
-    plt.title(f'Phishing Threats by {url_filter.title()}')
-    plt.show()
+class URLGraph:
+    def __init__(self, urls, count):
+        self.urls = urls
+        self.count = count
+    
+    # URL:{pair[0]} Count: {pair[1]}"
+    # Build out our graph from the self.urls and self.count.
+    def build_graph(self, options=None):
+        # We want to show the (count) amount of URLs
+        spacing = len(self.urls) / self.count #testing this
+
+        
+
+        top_urls = sorted(self.urls, key=lambda row: (row[1]), reverse=True)[:self.count]
+        print(top_urls)
+        start_of_text = 100 #what is this doing
+
+        for index, url in enumerate(top_urls):
+            plt.barh(spacing * index, height=2, width=url[1])
+            plt.text(start_of_text, spacing * index, str(url[0]), color='black', fontweight='bold', verticalalignment='center')
+        
+        # Making sure yticks are empty
+        plt.yticks([], [])
+        # Adding labels
+        plt.ylabel('URLs')
+        plt.xlabel('Count')
+        plt.title(f'Phishing Threats by URL Path')
+        plt.show()
+
 
 # Run LCS on blocks.
 def block_lcs(blocks):
@@ -151,24 +164,7 @@ if __name__ == "__main__":
         print_output(results)
     else:
         save_output(results, report_name)
-    # Graphing output will become an option after 1.5 or so.
-    ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
-    ## TODO Replace these values with variables that can be overidden by optional flags.
-    ## TODO Put graphing in its own library.
-    '''
-    total_matches = 10
-    min_output_length = 5
-    # Sort our results and then store the top X key/value pairs.
-    # Filter results for faster outputs
-    # should no longer need to check for min output length hopefully
-    # or can bake this into LCS so it has a minimum length to accept
-    results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
-    graph_results = sorted(results.values())[-total_matches:]
-    graph_ticks = sorted(results.keys())[-total_matches:]
-    #print(results)
-    # If a URL is too long...
-    for i, v in enumerate(graph_ticks):
-        if len(v) > 30:
-            graph_ticks[i] = v[:30] + "..."
-    build_graph(graph_results, graph_ticks, url_filter)
-    '''
+
+
+    test_output = URLGraph(loop_dict(results), 10)
+    test_output.build_graph()
