@@ -6,6 +6,7 @@ import argparse
 from lcs import driver
 from chunking import BLOCK_SIZE
 from urlgraph import URLGraph
+from known_paths import identify_software
 from time import perf_counter as timer
 
 
@@ -79,6 +80,7 @@ def loop_dict(results):
     # Send 2D array to directory_elim
     directory_only = directory_elim(new_results)
     # Returns 2D array of paths that only have directories and their counts. 
+    #print(directory_only[:10])
     return directory_only
 
 def directory_elim(results):
@@ -103,6 +105,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', default="txt", choices=["csv", "json", "txt"], help="Input: Determines the file type of the database used.")
     group.add_argument('-o', default = "print", choices=["print", "save"], help="Output: Determines if saved to a file or printed to screen.")
     parser.add_argument('-n', default ="report.txt", help="Name: The name that the report file will be saved as.")
+    parser.add_argument('-s', default=False, action="store_true", help="Software Paths: Prints the output of software path matches.")
     args = parser.parse_args()
 
     # Variables to store main actions we will take.
@@ -112,6 +115,8 @@ if __name__ == "__main__":
     # Report type and output.
     report_output = str(args.o)
     report_name = str(args.n)
+    # Additional actions
+    check_softwarepaths = args.s
 
     # An array of URLs extracted from supported file types.
     urls = fetch.open_database(db_file, total_urls, db_type)
@@ -136,5 +141,11 @@ if __name__ == "__main__":
         save_output(results, report_name)
 
     # Build a URLGraph object with the top 10 results of loop_dict(results) 
-    test_output = URLGraph(loop_dict(results), 10)
+    cleaned_results = loop_dict(results)
+
+    if check_softwarepaths:
+        software_count = identify_software(cleaned_results)
+        for software in software_count:
+            print(f"There are {software_count[software]} URL paths related to {software}")
+    test_output = URLGraph(cleaned_results, 10)
     test_output.build_graph()
