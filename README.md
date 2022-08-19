@@ -1,8 +1,5 @@
 ![EmThreat Logo](https://imgur.com/Hv703W4.png)
 
-# Project Future
-It has been 2 months since I updated EmThreat to 1.3. There are plenty of features left on my list but the consistent work I need to put into this to reach them goes beyond what I can commit to at the moment. I have multiple hobbies and projects that I am working on, so putting forth 5 hours a week into this utility adds up. I will be re-visiting my roadmap and simplying the features to create a single, cohesive threat intelligence tool. Mainly, pulling as much information as possible out of paths and domains while not overwhelming the user with switches.
-
 # About EmThreat 1.4
 Threat Intelligence tool utilizing a CLI interface to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
 
@@ -13,6 +10,9 @@ This is built off of the amazing research done by [UAB's Center for Cyber Securi
 ## Updates
 
 - Speed boost by revisiting how chunking.py works and moving async calls from lcs.py to emthreat.py. (0.55 minutes on 10k URLs to 0.07 minutes!)
+- Graphs are now back by default! (Toggles and options coming soon)
+- Cleaned up code, other performance improvements.
+- Base function made to identify common software paths. 
 
 # What we want out of intelligence
 - Domain & Paths
@@ -26,7 +26,7 @@ This is built off of the amazing research done by [UAB's Center for Cyber Securi
 
 ### Usage:
 `usage: emthreat.py [-h] [-f F] [-c C] [-i {csv,json,txt}] -o {print,save}
-                   [-n N]`
+                   [-n N] [-s]`
 
 optional arguments:
 
@@ -36,6 +36,7 @@ optional arguments:
   - -i | {csv,json,txt} | Input: Determines the file type of the database used.
   - -o | {print,save} |   Output: Determines if saved to a file or printed to screen.
   - -n |              Name: The name that the report file will be saved as.
+  - -s |              To print out software paths found in the report.
 
 ## Contributing
 emthreat.py is the main driver file that handles arguments, calls functions from supporting libraries, and executes the output.
@@ -47,3 +48,7 @@ dataset_utility.py cleans up the URLs and has code for interacting with XLS file
 chunking.py holds functions to break up large datasets to improve the speed of lcs.py. 
 
 fetch.py holds functions for interacting with PhishTank and pulling data from local files.
+
+urlgraph.py builds the Graph.
+
+known_paths.py has functions related to comparing software paths to known software.
