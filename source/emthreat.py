@@ -5,6 +5,7 @@ import argparse
 
 from lcs import driver
 from chunking import BLOCK_SIZE
+from urlgraph import URLGraph
 from time import perf_counter as timer
 
 
@@ -12,7 +13,6 @@ import chunking
 import dataset_utility
 import fetch
 
-import matplotlib.pyplot as plt
 from multiprocessing.pool import ThreadPool
 
 '''
@@ -28,40 +28,6 @@ python3 EmThreat.py --help
 '''
 
 THREAD_COUNT = BLOCK_SIZE // 2
-
-class URLGraph:
-    def __init__(self, urls, count):
-        self.urls = urls
-        self.count = count
-    
-    # URL:{pair[0]} Count: {pair[1]}"
-    # Build out our graph from the self.urls and self.count.
-    def build_graph(self, options=None):
-        # We want to show the (count) amount of URLs
-        spacing = (len(self.urls) / self.count) * 2#testing this
-
-        
-        # Using a lambda to sort the URLs
-        top_urls = sorted(self.urls, key=lambda row: (row[1]), reverse=True)[:self.count]
-        print(top_urls)
-        
-
-        for index, url in enumerate(top_urls):
-            plt.barh(spacing * index, height=1, width=url[1])
-            #start_of_text = url[1] + 10 #X-pos of the text, starting at the end of the bar
-            start_of_text = 5
-            plt.text(start_of_text, spacing * index, str(url[0]), color='black', fontweight='bold', verticalalignment='center', wrap=True)
-        
-        # Making sure yticks are empty
-        plt.yticks([], [])
-        # Adding labels
-        plt.ylabel('URLs')
-        plt.xlabel('Count')
-        plt.title(f'Phishing Threats by URL Path')
-        plt.get_current_fig_manager().set_window_title('EmThreat')
-        #plt.get_current_fig_manager().resize(1500, 600)
-        plt.show()
-
 
 # Run LCS on blocks.
 def block_lcs(blocks):
@@ -169,6 +135,6 @@ if __name__ == "__main__":
     else:
         save_output(results, report_name)
 
-
+    # Build a URLGraph object with the top 10 results of loop_dict(results) 
     test_output = URLGraph(loop_dict(results), 10)
     test_output.build_graph()
