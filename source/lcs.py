@@ -13,12 +13,14 @@ def lcs(s1, s2):
     seq = SequenceMatcher(None, s1, s2)
     lcs = seq.find_longest_match(0, len(s1),0, len(s2))
     if (lcs.size != 0):
-    	return str(s1[lcs.a: lcs.a + lcs.size])
+        return str(s1[lcs.a: lcs.a + lcs.size])
     else:
-    	return ""
+        return ""
 
 
 def lcs_driver(combos):
+    urls = {}
+    tried = {}
     # This is a driver that runs in async with other threads.
     # It will run over a subset of the combo list.
     for pair in combos:
@@ -44,51 +46,14 @@ def lcs_driver(combos):
         # Otherwise it is added.
         else:
             urls[holder] = 1
-
+    return urls
 
 
 # Maintaining 2 dictionaries in the driver.
 # As well as an n-length list using a n^2 loop.
 def driver(wordlist):
-    # Using globals so the async threads update the dictionaries
-    # otherwise we could get race conditions
-    global urls
-    global tried
-
-    urls = {}
-    tried = {}
     import itertools
-    from multiprocessing.pool import ThreadPool
     # Goes over the wordlist to find all combinations of words that we will run across.
     combos = [ combo for combo in itertools.combinations(wordlist,2)]
-
-    # Cut combos into a list of n/10
-    # Run pool.apply_async on each slide
-
-    # Now that this works, lets dynamically create threads based 
-    # on thread count + slices
-    threads = 20
-    slices = len(combos)//threads
-
-    pool = ThreadPool(processes=threads)
-
-    #Create our threads..except the last one.
-    for thread in range(threads - 1):
-        # This will give us 10 * 0 on the first thread
-        # and 10 * 1 on the second
-        # etc
-        current = slices * thread
-        next_section = slices * (thread + 1)
-        #print(f"{current}:{next_section}")
-        # Each thread will be [0:10], [10:20], etc 
-        # with the number being based on length / 10
-        pool.apply_async(lcs_driver(combos[current:next_section]))
-
-
-    # Create the final thread
-    pool.apply_async(lcs_driver(combos[slices:]))
-
-    # We could store the result of these async threads in a variable
-    # but nothing is being returned because we use globals.
-    
+    urls = lcs_driver(combos)
     return urls

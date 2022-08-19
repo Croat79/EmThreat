@@ -3,12 +3,16 @@
 # Project Future
 It has been 2 months since I updated EmThreat to 1.3. There are plenty of features left on my list but the consistent work I need to put into this to reach them goes beyond what I can commit to at the moment. I have multiple hobbies and projects that I am working on, so putting forth 5 hours a week into this utility adds up. I will be re-visiting my roadmap and simplying the features to create a single, cohesive threat intelligence tool. Mainly, pulling as much information as possible out of paths and domains while not overwhelming the user with switches.
 
-# About EmThreat 1.3
+# About EmThreat 1.4
 Threat Intelligence tool utilizing a CLI interface to detect emerging threats by analyzing reports from PhishTank. Download the dataset at [PhishTank's website.](https://www.phishtank.com/developer_info.php)
 
 The goal of this tool is to quickly analyze the most common paths of phishing websites, which can be used to classify recently vulnerable software and provide immediate warning to security teams before wide-scale attacks are reported.
 
 This is built off of the amazing research done by [UAB's Center for Cyber Security](https://www.uab.edu/cas/thecenter/images/Documents/Identifying-Vulnerable-Websites-by-Analysis-of-Common-Strings-in-Phishing-URLs.pdf)
+
+## Updates
+
+- Speed boost by revisiting how chunking.py works and moving async calls from lcs.py to emthreat.py. (0.55 minutes on 10k URLs to 0.07 minutes!)
 
 # What we want out of intelligence
 - Domain & Paths

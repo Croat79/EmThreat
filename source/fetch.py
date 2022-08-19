@@ -53,5 +53,5 @@ def open_database(db, entries, filetype):
             urls = loop_data(file, entries, True)
         else:
             # Otherwise append normally.
-            urls = loop_data(file, entries, False)
+            urls = loop_data(file, entries, False) 
     return urls

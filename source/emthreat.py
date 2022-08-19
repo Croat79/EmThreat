@@ -4,6 +4,9 @@ import sys
 import argparse
 
 from lcs import driver
+from chunking import BLOCK_SIZE
+from urlgraph import URLGraph
+from known_paths import identify_software
 from time import perf_counter as timer
 
 
@@ -11,7 +14,7 @@ import chunking
 import dataset_utility
 import fetch
 
-import matplotlib.pyplot as plt
+from multiprocessing.pool import ThreadPool
 
 '''
 EmThreat is a tool to help web admins notice spikes in phishing activity
@@ -25,31 +28,19 @@ that software may have a new exploit targeting it.
 python3 EmThreat.py --help
 '''
 
-# Build a graph from the results and our filter.
-def build_graph(results, names, url_filter):
-    spacing = 3
-    start_of_text = (max(results)/100) * 2 #Places test 2% in every time.
-    # Adding the URLs to the bar chart.
-    for i, x in enumerate(results):
-        plt.barh(spacing * i, height=2, width=x)
-    for j, v in enumerate(names):
-        plt.text(start_of_text, spacing * j, str(v), color='black', fontweight='bold', verticalalignment='center')
-    # Making sure yticks are empty
-    plt.yticks([], [])
-    # Adding out labels
-    plt.ylabel('URLs')
-    plt.xlabel('Count')
-    plt.title(f'Phishing Threats by {url_filter.title()}')
-    plt.show()
+THREAD_COUNT = BLOCK_SIZE // 2
 
 # Run LCS on blocks.
 def block_lcs(blocks):
     # Create an array to store the dictionary outputs.
     results = []
+    threads = THREAD_COUNT
+    pool = ThreadPool(processes=threads)
     for block in blocks:
-        # LCS returns a dictionary.
-        words = driver(block)
-        results.append(words)
+        # driver returns a dictionary of URLs from lcs.py.
+        async_result = pool.apply_async(driver, (block,))
+        result = async_result.get()
+        results.append(result)
     # Returns [{url:count}, {url2:count2},...]
     return results
 
@@ -89,6 +80,7 @@ def loop_dict(results):
     # Send 2D array to directory_elim
     directory_only = directory_elim(new_results)
     # Returns 2D array of paths that only have directories and their counts. 
+    #print(directory_only[:10])
     return directory_only
 
 def directory_elim(results):
@@ -113,6 +105,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', default="txt", choices=["csv", "json", "txt"], help="Input: Determines the file type of the database used.")
     group.add_argument('-o', default = "print", choices=["print", "save"], help="Output: Determines if saved to a file or printed to screen.")
     parser.add_argument('-n', default ="report.txt", help="Name: The name that the report file will be saved as.")
+    parser.add_argument('-s', default=False, action="store_true", help="Software Paths: Prints the output of software path matches.")
     args = parser.parse_args()
 
     # Variables to store main actions we will take.
@@ -122,6 +115,8 @@ if __name__ == "__main__":
     # Report type and output.
     report_output = str(args.o)
     report_name = str(args.n)
+    # Additional actions
+    check_softwarepaths = args.s
 
     # An array of URLs extracted from supported file types.
     urls = fetch.open_database(db_file, total_urls, db_type)
@@ -144,24 +139,13 @@ if __name__ == "__main__":
         print_output(results)
     else:
         save_output(results, report_name)
-    # Graphing output will become an option after 1.5 or so.
-    ## TODO Now that the results is an array of dictionaries, we have to handle graphing slightly differently.
-    ## TODO Replace these values with variables that can be overidden by optional flags.
-    ## TODO Put graphing in its own library.
-    '''
-    total_matches = 10
-    min_output_length = 5
-    # Sort our results and then store the top X key/value pairs.
-    # Filter results for faster outputs
-    # should no longer need to check for min output length hopefully
-    # or can bake this into LCS so it has a minimum length to accept
-    results = {k:v for (k,v) in results.items() if len(k) > min_output_length}
-    graph_results = sorted(results.values())[-total_matches:]
-    graph_ticks = sorted(results.keys())[-total_matches:]
-    #print(results)
-    # If a URL is too long...
-    for i, v in enumerate(graph_ticks):
-        if len(v) > 30:
-            graph_ticks[i] = v[:30] + "..."
-    build_graph(graph_results, graph_ticks, url_filter)
-    '''
+
+    # Build a URLGraph object with the top 10 results of loop_dict(results) 
+    cleaned_results = loop_dict(results)
+
+    if check_softwarepaths:
+        software_count = identify_software(cleaned_results)
+        for software in software_count:
+            print(f"There are {software_count[software]} URL paths related to {software}")
+    test_output = URLGraph(cleaned_results, 10)
+    test_output.build_graph()
