@@ -38,17 +38,19 @@ class URLGraph:
     # Build out our graph from the self.urls and self.count.
     def build_graph(self, options=None):
         # We want to show the (count) amount of URLs
-        spacing = len(self.urls) / self.count #testing this
+        spacing = (len(self.urls) / self.count) * 2#testing this
 
         
-
+        # Using a lambda to sort the URLs
         top_urls = sorted(self.urls, key=lambda row: (row[1]), reverse=True)[:self.count]
         print(top_urls)
-        start_of_text = 100 #what is this doing
+        
 
         for index, url in enumerate(top_urls):
-            plt.barh(spacing * index, height=2, width=url[1])
-            plt.text(start_of_text, spacing * index, str(url[0]), color='black', fontweight='bold', verticalalignment='center')
+            plt.barh(spacing * index, height=1, width=url[1])
+            #start_of_text = url[1] + 10 #X-pos of the text, starting at the end of the bar
+            start_of_text = 5
+            plt.text(start_of_text, spacing * index, str(url[0]), color='black', fontweight='bold', verticalalignment='center', wrap=True)
         
         # Making sure yticks are empty
         plt.yticks([], [])
@@ -56,6 +58,8 @@ class URLGraph:
         plt.ylabel('URLs')
         plt.xlabel('Count')
         plt.title(f'Phishing Threats by URL Path')
+        plt.get_current_fig_manager().set_window_title('EmThreat')
+        #plt.get_current_fig_manager().resize(1500, 600)
         plt.show()
 
 

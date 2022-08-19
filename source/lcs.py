@@ -13,9 +13,9 @@ def lcs(s1, s2):
     seq = SequenceMatcher(None, s1, s2)
     lcs = seq.find_longest_match(0, len(s1),0, len(s2))
     if (lcs.size != 0):
-    	return str(s1[lcs.a: lcs.a + lcs.size])
+        return str(s1[lcs.a: lcs.a + lcs.size])
     else:
-    	return ""
+        return ""
 
 
 def lcs_driver(combos):
